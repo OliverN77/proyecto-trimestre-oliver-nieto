@@ -1,0 +1,278 @@
+@import url("https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600;700&family=Work+Sans:wght@300;400;500;600&display=swap");
+@import "tailwindcss";
+
+:root {
+    --notte: #16324f;
+    --notte-2: #0e2338;
+    --limone: #e8b23d;
+    --terracotta: #c1502e;
+    --azzurro: #4e93b8;
+    --panna: #f6efdd;
+    --oliva: #6b7c4e;
+    --inchiostro: #241b12;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    margin: 0;
+    background: var(--panna);
+    color: var(--inchiostro);
+    font-family: "Jost", "Work Sans", "Segoe UI", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.input-base {
+    width: 100%;
+    border-radius: 0.5rem;
+    border: 1px solid rgba(22, 50, 79, 0.2);
+    background: #ffffff;
+    padding: 0.625rem 1rem;
+    color: var(--inchiostro);
+    outline: none;
+    transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.input-error {
+    border-color: var(--terracotta);
+}
+
+.input-base::placeholder {
+    color: rgba(36, 27, 18, 0.4);
+}
+
+.input-base:focus {
+    border-color: var(--azzurro);
+    box-shadow: 0 0 0 2px rgba(78, 147, 184, 0.3);
+}
+
+.input-error:focus {
+    border-color: var(--terracotta);
+    box-shadow: 0 0 0 2px rgba(193, 80, 46, 0.3);
+}
+
+/* ─── Reservations feature styles ─────────────────────────────────────────── */
+
+/* Step indicator */
+.step-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 2rem;
+}
+
+.step-dot {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    transition: background 300ms ease, color 300ms ease, transform 300ms ease;
+    background: rgba(22, 50, 79, 0.12);
+    color: rgba(22, 50, 79, 0.5);
+    flex-shrink: 0;
+}
+
+.step-dot.active {
+    background: var(--notte);
+    color: var(--panna);
+    transform: scale(1.15);
+    box-shadow: 0 0 0 4px rgba(22, 50, 79, 0.15);
+}
+
+.step-dot.done {
+    background: var(--oliva);
+    color: white;
+}
+
+.step-line {
+    flex: 1;
+    height: 2px;
+    background: rgba(22, 50, 79, 0.12);
+    transition: background 400ms ease;
+}
+
+.step-line.done {
+    background: var(--oliva);
+}
+
+/* Table tile for floor plan picker */
+.table-tile {
+    position: relative;
+    border-radius: 1rem;
+    border: 2px solid rgba(22, 50, 79, 0.12);
+    background: white;
+    padding: 1rem;
+    cursor: pointer;
+    transition: border-color 220ms ease, box-shadow 220ms ease, transform 220ms ease, background 220ms ease;
+    text-align: center;
+    user-select: none;
+}
+
+.table-tile:hover {
+    border-color: var(--azzurro);
+    box-shadow: 0 4px 20px rgba(78, 147, 184, 0.2);
+    transform: translateY(-2px);
+}
+
+.table-tile.selected {
+    border-color: var(--terracotta);
+    background: rgba(193, 80, 46, 0.05);
+    box-shadow: 0 0 0 3px rgba(193, 80, 46, 0.25), 0 6px 24px rgba(193, 80, 46, 0.15);
+    transform: translateY(-3px);
+}
+
+.table-tile.selected .table-tile-icon {
+    color: var(--terracotta);
+}
+
+.table-tile-icon {
+    font-size: 2rem;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    transition: color 220ms ease;
+    color: var(--azzurro);
+}
+
+.table-tile-num {
+    font-family: "Jost", sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--notte);
+}
+
+.table-tile-cap {
+    font-size: 0.72rem;
+    color: rgba(36, 27, 18, 0.55);
+    margin-top: 0.2rem;
+}
+
+.table-tile-loc {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--azzurro);
+    margin-top: 0.3rem;
+}
+
+.table-tile.selected .table-tile-loc {
+    color: var(--terracotta);
+}
+
+/* Reservation card (for list views) */
+.reserva-card {
+    border-radius: 1rem;
+    border: 1px solid rgba(22, 50, 79, 0.1);
+    background: white;
+    padding: 1.25rem 1.5rem;
+    transition: box-shadow 200ms ease, transform 200ms ease;
+}
+
+.reserva-card:hover {
+    box-shadow: 0 6px 24px rgba(22, 50, 79, 0.1);
+    transform: translateY(-1px);
+}
+
+/* Status badge */
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.status-badge.pendiente {
+    background: rgba(232, 178, 61, 0.15);
+    color: #9a6e00;
+}
+
+.status-badge.confirmada {
+    background: rgba(107, 124, 78, 0.15);
+    color: var(--oliva);
+}
+
+.status-badge.completada {
+    background: rgba(78, 147, 184, 0.15);
+    color: #2d6f91;
+}
+
+.status-badge.cancelada {
+    background: rgba(193, 80, 46, 0.12);
+    color: var(--terracotta);
+}
+
+/* Kanban column */
+.kanban-col {
+    border-radius: 1rem;
+    background: rgba(22, 50, 79, 0.04);
+    padding: 1rem;
+    min-height: 200px;
+}
+
+.kanban-col-header {
+    font-family: "Jost", sans-serif;
+    font-weight: 600;
+    font-size: 0.8rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.kanban-count {
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    background: var(--notte);
+    color: var(--panna);
+    font-size: 0.7rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Success animation */
+@keyframes pop-in {
+    0% { transform: scale(0.5); opacity: 0; }
+    70% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes check-draw {
+    0% { stroke-dashoffset: 50; }
+    100% { stroke-dashoffset: 0; }
+}
+
+@keyframes fade-up {
+    0% { opacity: 0; transform: translateY(12px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-pop-in {
+    animation: pop-in 450ms cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-fade-up {
+    animation: fade-up 400ms ease forwards;
+}
+
+.success-check {
+    stroke-dasharray: 50;
+    stroke-dashoffset: 50;
+    animation: check-draw 500ms ease 300ms forwards;
+}

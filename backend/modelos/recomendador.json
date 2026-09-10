@@ -1,0 +1,8 @@
+{
+  "version": "1.0",
+  "metodo": "prioridad_por_tipo_y_coincidencia_de_texto",
+  "prioridades": {
+    "producto": 2,
+    "servicio": 1
+  }
+}
