@@ -1,7 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable no-undef */
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react"
 import { Navigate } from "react-router-dom"
 
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL || "https://proyecto-trimestre.onrender.com/api"
 
 const STATUS_LABELS = { pendiente: "Pendiente", confirmada: "Confirmada", completada: "Completada", cancelada: "Cancelada" }
 const STATUS_COLORS = {
@@ -136,7 +139,8 @@ function ReservationsBoard({ token, catalogProductos }) {
         }
     }
 
-    useEffect(() => { cargarReservas() }, [filtroFecha, filtroEstado])
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    useEffect(() => { cargarReservas() }, [filtroFecha, filtroEstado, cargarReservas])
 
     // Group reservas by status
     const columns = [

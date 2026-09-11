@@ -4,7 +4,7 @@ import Input from "../components/ui/Input"
 import Button from "../components/ui/Button"
 import RegisterModal from "../components/RegisterModal"
 
-const API_URL = import.meta.env.VITE_API_URL
+const API_URL = import.meta.env.VITE_API_URL || "https://proyecto-trimestre.onrender.com/api"
 
 export default function Login() {
     const [form, setForm] = useState({ email: "", password: "", remember: false })
