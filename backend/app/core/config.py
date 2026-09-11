@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
-    cors_origins: str = "https://proyecto-trimestre-oliver-nieto.vercel.app"
+    cors_origins: str = "http://localhost:5173,https://proyecto-trimestre-oliver-nieto.vercel.app"
     recommendation_model_path: str = "modelos/recomendador.json"
     recommendation_provider_url: str = ""
     recommendation_provider_timeout: float = 2.0
@@ -42,7 +42,7 @@ class Settings(BaseSettings):
 
     @property
     def cors_origins_list(self) -> list[str]:
-        return [origin.strip() for origin in self.cors_origins.split(",") if origin.strip()]
+        return [origin.strip().rstrip("/") for origin in self.cors_origins.split(",") if origin.strip()]
 
 
 settings = Settings()
