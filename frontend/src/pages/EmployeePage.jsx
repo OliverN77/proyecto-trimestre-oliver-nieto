@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { Navigate } from "react-router-dom"
 
-const API_URL = import.meta.env.VITE_API_URL || "https://proyecto-trimestre.onrender.com/api"
+const API_URL = import.meta.env.VITE_API_URL
 
 const STATUS_LABELS = { pendiente: "Pendiente", confirmada: "Confirmada", completada: "Completada", cancelada: "Cancelada" }
 const STATUS_COLORS = {

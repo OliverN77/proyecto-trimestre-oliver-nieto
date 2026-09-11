@@ -4,7 +4,7 @@ import Input from "./ui/Input"
 import Select from "./ui/Select"
 import Button from "./ui/Button"
 
-const API_URL = import.meta.env.VITE_API_URL || "https://proyecto-trimestre.onrender.com/api"
+const API_URL = import.meta.env.VITE_API_URL
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const DOCUMENT_PATTERN = /^\d{6,12}$/
 const PHONE_PATTERN = /^\d{7,10}$/
