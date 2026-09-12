@@ -18,7 +18,7 @@ class Reserva(Base):
     cantidad_personas: Mapped[int] = mapped_column(Integer, nullable=False)
     estado: Mapped[str] = mapped_column(Enum("pendiente", "confirmada", "cancelada", "completada"), nullable=False)
     observaciones: Mapped[str | None] = mapped_column(Text)
-    creada_en: Mapped[datetime]
+    creada_en: Mapped[datetime] = mapped_column(default=datetime.utcnow, nullable=False)
 
     productos = relationship("ReservaProducto", backref="reserva", cascade="all, delete-orphan")
     servicios = relationship("ReservaServicio", backref="reserva", cascade="all, delete-orphan")
