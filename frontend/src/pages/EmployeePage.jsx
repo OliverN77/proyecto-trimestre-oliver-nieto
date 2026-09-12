@@ -99,7 +99,7 @@ function ReservaKanbanCard({ reserva, actions, actualizando, onActualizar, catal
                 <div>
                     <p style={{ fontWeight: 700, color: "var(--notte)", fontSize: "0.88rem", margin: 0, display: "flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap" }}>
                         Mesa {reserva.numero_mesa}
-                        {reserva.estado !== "cancelada" && (
+                        {(reserva.estado === "pendiente" || reserva.estado === "confirmada") && (
                             <span style={{ fontSize: "0.65rem", padding: "0.1rem 0.4rem", borderRadius: "0.3rem", background: "rgba(193,80,46,0.12)", color: "var(--terracotta)", fontWeight: 700, textTransform: "uppercase" }}>
                                 Ocupada
                             </span>
@@ -228,7 +228,7 @@ function ReservationsBoard({ token, catalogProductos }) {
     useEffect(() => { cargarReservas() }, [filtroFecha, filtroEstado])
 
     const columns = [
-        { key: "pendiente", label: "Pendiente", icon: "⏳", actions: [{ label: "Confirmar", next: "confirmada", style: { background: "var(--oliva)", color: "white" } }, { label: "Completar", next: "completada", style: { background: "rgba(17,94,89,0.12)", color: "#0f766e", border: "1.5px solid #0f766e" } }, { label: "Cancelar", next: "cancelada", style: { background: "rgba(193,80,46,0.12)", color: "var(--terracotta)", border: "1.5px solid var(--terracotta)" } }] },
+        { key: "pendiente", label: "Pendiente", icon: "⏳", actions: [{ label: "Confirmar", next: "confirmada", style: { background: "var(--oliva)", color: "white" } }, { label: "Cancelar", next: "cancelada", style: { background: "rgba(193,80,46,0.12)", color: "var(--terracotta)", border: "1.5px solid var(--terracotta)" } }] },
         { key: "confirmada", label: "Confirmada", icon: "✅", actions: [{ label: "Completar", next: "completada", style: { background: "rgba(17,94,89,0.12)", color: "#0f766e", border: "1.5px solid #0f766e" } }, { label: "Cancelar", next: "cancelada", style: { background: "rgba(193,80,46,0.12)", color: "var(--terracotta)", border: "1.5px solid var(--terracotta)" } }] },
         { key: "completada", label: "Completada", icon: "✓", actions: [] },
         { key: "cancelada", label: "Cancelada", icon: "✗", actions: [] },

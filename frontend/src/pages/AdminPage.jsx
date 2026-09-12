@@ -211,7 +211,7 @@ function AdminReservationsBoard({ token, usuarios = [] }) {
     }
 
     const columns = [
-        { key: "pendiente", label: "Pendiente", icon: "⏳", actions: [{ label: "Confirmar", next: "confirmada", style: { background: "var(--oliva)", color: "white" } }, { label: "Completar", next: "completada", style: { background: "rgba(17,94,89,0.12)", color: "#0f766e", border: "1.5px solid #0f766e" } }, { label: "Cancelar", next: "cancelada", style: { background: "rgba(193,80,46,0.12)", color: "var(--terracotta)", border: "1.5px solid var(--terracotta)" } }] },
+        { key: "pendiente", label: "Pendiente", icon: "⏳", actions: [{ label: "Confirmar", next: "confirmada", style: { background: "var(--oliva)", color: "white" } }, { label: "Cancelar", next: "cancelada", style: { background: "rgba(193,80,46,0.12)", color: "var(--terracotta)", border: "1.5px solid var(--terracotta)" } }] },
         { key: "confirmada", label: "Confirmada", icon: "✅", actions: [{ label: "Completar", next: "completada", style: { background: "rgba(17,94,89,0.12)", color: "#0f766e", border: "1.5px solid #0f766e" } }, { label: "Cancelar", next: "cancelada", style: { background: "rgba(193,80,46,0.12)", color: "var(--terracotta)", border: "1.5px solid var(--terracotta)" } }] },
         { key: "completada", label: "Completada", icon: "✓", actions: [] },
         { key: "cancelada", label: "Cancelada", icon: "✗", actions: [] },

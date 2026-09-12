@@ -1,5 +1,6 @@
 from datetime import date, datetime, time
 from typing import Optional
+from zoneinfo import ZoneInfo
 
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy import and_, select
@@ -20,10 +21,11 @@ from app.models.usuario import Usuario
 from app.schemas.reserva import ReservaConCliente, ReservaCreate, ReservaEstadoUpdate, ReservaOut, ReservaProductoCreate, ReservaAdminCreate
 
 router = APIRouter(prefix="/api/reservas", tags=["Reservas"], responses=API_RESPONSES)
+RESTAURANT_TIMEZONE = ZoneInfo("America/Bogota")
 
 
 def auto_completar_reservas_vencidas(db: Session):
-    now = datetime.now()
+    now = datetime.now(RESTAURANT_TIMEZONE)
     hoy = now.date()
     hora_actual = now.time()
 
