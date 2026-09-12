@@ -7,6 +7,7 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api"
 const STATUS_COLORS = {
     pendiente: { bg: "rgba(232,178,61,0.12)", color: "#9a6e00" },
     confirmada: { bg: "rgba(107,124,78,0.12)", color: "var(--oliva)" },
+    completada: { bg: "rgba(17,94,89,0.12)", color: "#0f766e" },
     cancelada: { bg: "rgba(193,80,46,0.12)", color: "var(--terracotta)" },
 }
 
@@ -227,8 +228,9 @@ function ReservationsBoard({ token, catalogProductos }) {
     useEffect(() => { cargarReservas() }, [filtroFecha, filtroEstado])
 
     const columns = [
-        { key: "pendiente", label: "Pendiente", icon: "⏳", actions: [{ label: "Confirmar", next: "confirmada", style: { background: "var(--oliva)", color: "white" } }, { label: "Cancelar", next: "cancelada", style: { background: "rgba(193,80,46,0.12)", color: "var(--terracotta)", border: "1.5px solid var(--terracotta)" } }] },
-        { key: "confirmada", label: "Confirmada", icon: "✅", actions: [{ label: "Cancelar", next: "cancelada", style: { background: "rgba(193,80,46,0.12)", color: "var(--terracotta)", border: "1.5px solid var(--terracotta)" } }] },
+        { key: "pendiente", label: "Pendiente", icon: "⏳", actions: [{ label: "Confirmar", next: "confirmada", style: { background: "var(--oliva)", color: "white" } }, { label: "Completar", next: "completada", style: { background: "rgba(17,94,89,0.12)", color: "#0f766e", border: "1.5px solid #0f766e" } }, { label: "Cancelar", next: "cancelada", style: { background: "rgba(193,80,46,0.12)", color: "var(--terracotta)", border: "1.5px solid var(--terracotta)" } }] },
+        { key: "confirmada", label: "Confirmada", icon: "✅", actions: [{ label: "Completar", next: "completada", style: { background: "rgba(17,94,89,0.12)", color: "#0f766e", border: "1.5px solid #0f766e" } }, { label: "Cancelar", next: "cancelada", style: { background: "rgba(193,80,46,0.12)", color: "var(--terracotta)", border: "1.5px solid var(--terracotta)" } }] },
+        { key: "completada", label: "Completada", icon: "✓", actions: [] },
         { key: "cancelada", label: "Cancelada", icon: "✗", actions: [] },
     ]
 
@@ -248,6 +250,7 @@ function ReservationsBoard({ token, catalogProductos }) {
                         <option value="">Todos</option>
                         <option value="pendiente">Pendiente</option>
                         <option value="confirmada">Confirmada</option>
+                        <option value="completada">Completada</option>
                         <option value="cancelada">Cancelada</option>
                     </select>
                 </div>

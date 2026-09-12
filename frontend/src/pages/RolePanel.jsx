@@ -6,7 +6,7 @@ const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api"
 
 // ─── Shared helpers ────────────────────────────────────────────────────────────
 
-const STATUS_LABELS = { pendiente: "Pendiente", confirmada: "Confirmada", cancelada: "Cancelada"}
+const STATUS_LABELS = { pendiente: "Pendiente", confirmada: "Confirmada", completada: "Completada", cancelada: "Cancelada"}
 
 const UBICACION_ICON = { "terraza": "🌿", "ventana": "🌅", "interior": "🕯️", "jardín": "🌸", "bar": "🍷" }
 
@@ -469,9 +469,14 @@ function ReservationsList({ reservas, token, onActualizado }) {
                                 <div>
                                     <p style={{ fontWeight: 700, color: "var(--notte)", fontSize: "0.95rem", marginBottom: "0.2rem", display: "flex", alignItems: "center", gap: "0.4rem", flexWrap: "wrap" }}>
                                         Mesa {reserva.numero_mesa}
-                                        {reserva.estado !== "cancelada" && (
+                                        {reserva.estado === "pendiente" || reserva.estado === "confirmada" ? (
                                             <span style={{ fontSize: "0.7rem", padding: "0.15rem 0.5rem", borderRadius: "0.3rem", background: "rgba(193,80,46,0.12)", color: "var(--terracotta)", fontWeight: 600 }}>
                                                 Mesa Ocupada
+                                            </span>
+                                        ) : null}
+                                        {reserva.estado === "completada" && (
+                                            <span style={{ fontSize: "0.7rem", padding: "0.15rem 0.5rem", borderRadius: "0.3rem", background: "rgba(17,94,89,0.12)", color: "#0f766e", fontWeight: 600 }}>
+                                                Completada
                                             </span>
                                         )}
                                         <span style={{ fontWeight: 400, color: "rgba(36,27,18,0.5)", fontSize: "0.8rem" }}>· {reserva.fecha_reserva}</span>
