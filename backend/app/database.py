@@ -6,9 +6,21 @@ from sqlalchemy.orm import DeclarativeBase, sessionmaker
 from app.core.config import settings
 from app.core.exceptions import ConflictError
 
-engine = create_engine(settings.database_url, pool_pre_ping=True)
+engine = create_engine(
+    settings.database_url,
+    pool_pre_ping=True,
+    pool_size=2,
+    max_overflow=0,
+    pool_recycle=1800,
+)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-async_engine = create_async_engine(settings.async_database_url, pool_pre_ping=True)
+async_engine = create_async_engine(
+    settings.async_database_url,
+    pool_pre_ping=True,
+    pool_size=2,
+    max_overflow=0,
+    pool_recycle=1800,
+)
 AsyncSessionLocal = async_sessionmaker(async_engine, expire_on_commit=False)
 
 
