@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 
 import logging
 
-from fastapi import APIRouter, BackgroundTasks, Depends, status
+from fastapi import APIRouter, BackgroundTasks, Depends, Response, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -56,7 +56,7 @@ def estado(documento: str, db: Session = Depends(get_db)):
     usuario = buscar_usuario(db, documento)
     solicitud = db.scalar(select(SolicitudRecuperacion).where(SolicitudRecuperacion.id_usuario == usuario.id_usuario).order_by(SolicitudRecuperacion.solicitada_en.desc()))
     if solicitud is None:
-        raise NotFoundError("Solicitud de recuperación", documento)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
     minutos = 0
     if solicitud.estado == "usada":
         limite = solicitud.solicitada_en.replace(tzinfo=timezone.utc) + timedelta(minutes=COOLDOWN_MINUTOS)

@@ -33,6 +33,10 @@ export default function RecoverPassword() {
         const timeoutId = window.setTimeout(async () => {
             try {
                 const response = await fetch(`${API_URL}/recuperacion/estado?documento=${encodeURIComponent(documento)}`)
+                if (response.status === 204) {
+                    setSolicitud(null)
+                    return
+                }
                 if (!response.ok) {
                     setSolicitud(null)
                     return
