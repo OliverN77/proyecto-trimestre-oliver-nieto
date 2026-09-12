@@ -10,5 +10,5 @@ class Mesa(Base):
     id_mesa: Mapped[int] = mapped_column(primary_key=True)
     numero_mesa: Mapped[int] = mapped_column(nullable=False)
     capacidad: Mapped[int] = mapped_column(nullable=False)
-    ubicacion: Mapped[str] = mapped_column(nullable=False)
-    estado: Mapped[str] = mapped_column(Enum("disponible", "ocupada", "mantenimiento"), nullable=False)
+    ubicacion: Mapped[str] = mapped_column(Enum("interior", "terraza", "vip"), nullable=False, default="interior")
+    estado: Mapped[str] = mapped_column(Enum("disponible", "ocupada", "mantenimiento"), nullable=False, default="disponible")

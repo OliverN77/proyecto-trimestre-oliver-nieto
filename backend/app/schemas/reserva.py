@@ -3,8 +3,8 @@ from typing import Literal
 
 from pydantic import BaseModel, Field, model_validator
 
-
 from app.schemas.producto import ProductoOut
+from app.schemas.servicio import ServicioOut
 
 
 class ReservaProductoCreate(BaseModel):
@@ -20,6 +20,19 @@ class ReservaProductoOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class ReservaServicioCreate(BaseModel):
+    id_servicio: int
+    cantidad: int = Field(ge=1)
+
+
+class ReservaServicioOut(BaseModel):
+    id_servicio: int
+    cantidad: int
+    servicio: ServicioOut
+
+    model_config = {"from_attributes": True}
+
+
 class ReservaCreate(BaseModel):
     fecha_reserva: date
     hora_inicio: time
@@ -28,6 +41,7 @@ class ReservaCreate(BaseModel):
     id_mesa: int
     observaciones: str | None = Field(default=None, max_length=500)
     productos: list[ReservaProductoCreate] = Field(default_factory=list)
+    servicios: list[ReservaServicioCreate] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def horario_valido(self):
@@ -36,11 +50,16 @@ class ReservaCreate(BaseModel):
         return self
 
 
+class ReservaAdminCreate(ReservaCreate):
+    id_cliente: int
+
+
 class ReservaOut(ReservaCreate):
     id_reserva: int
     estado: str
     numero_mesa: int
     productos: list[ReservaProductoOut] = Field(default_factory=list)
+    servicios: list[ReservaServicioOut] = Field(default_factory=list)
 
     model_config = {"from_attributes": True}
 

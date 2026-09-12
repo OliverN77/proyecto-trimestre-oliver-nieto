@@ -21,3 +21,5 @@ class Reserva(Base):
     creada_en: Mapped[datetime]
 
     productos = relationship("ReservaProducto", backref="reserva", cascade="all, delete-orphan")
+    servicios = relationship("ReservaServicio", backref="reserva", cascade="all, delete-orphan")
+

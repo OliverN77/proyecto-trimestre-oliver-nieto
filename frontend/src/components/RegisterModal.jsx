@@ -4,7 +4,7 @@ import Input from "./ui/Input"
 import Select from "./ui/Select"
 import Button from "./ui/Button"
 
-const API_URL = import.meta.env.VITE_API_URL || "https://proyecto-trimestre.onrender.com/api"
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api"
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const DOCUMENT_PATTERN = /^\d{6,12}$/
 const PHONE_PATTERN = /^\d{7,10}$/
@@ -181,7 +181,7 @@ export default function RegisterModal({ isOpen, onClose }) {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             required
-                            maxLength={50}
+                            maxLength={20}
                             aria-invalid={Boolean(fieldError("nombre"))}
                         />
                     </FieldWrapper>
@@ -194,7 +194,7 @@ export default function RegisterModal({ isOpen, onClose }) {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             required
-                            maxLength={50}
+                            maxLength={20}
                             aria-invalid={Boolean(fieldError("apellido"))}
                         />
                     </FieldWrapper>
@@ -234,7 +234,7 @@ export default function RegisterModal({ isOpen, onClose }) {
                         value={form.direccion}
                         onChange={handleChange}
                         onBlur={handleBlur}
-                        maxLength={150}
+                        maxLength={50}
                     />
                 </FieldWrapper>
 
@@ -262,7 +262,7 @@ export default function RegisterModal({ isOpen, onClose }) {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             required
-                            maxLength={100}
+                            maxLength={20}
                             aria-invalid={Boolean(fieldError("email"))}
                         />
                     </FieldWrapper>

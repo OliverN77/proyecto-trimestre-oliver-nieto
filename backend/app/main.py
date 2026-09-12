@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.exceptions import AuthorizationError, ConflictError, CredencialesInvalidasError, NotFoundError
-from app.routers import auth, pedidos, productos, recuperacion, reservas, servicios, usuarios
+from app.routers import auth, mesas, pedidos, productos, recuperacion, reservas, servicios, usuarios
 
 logger = logging.getLogger("taberna_del_faro.api")
 
@@ -20,11 +20,13 @@ app = FastAPI(
         {"name": "Usuarios", "description": "Gestión de usuarios y roles"},
         {"name": "Productos", "description": "Carta de productos del restaurante"},
         {"name": "Servicios", "description": "Servicios adicionales del restaurante"},
+        {"name": "Mesas", "description": "Gestión de mesas para reservaciones"},
         {"name": "Reservas", "description": "Reservas de mesas del restaurante"},
         {"name": "Pedidos", "description": "Pedidos de productos y servicios"},
         {"name": "Recuperación", "description": "Solicitudes de recuperación de acceso"},
     ],
 )
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -85,6 +87,8 @@ app.include_router(auth.router)
 app.include_router(usuarios.router)
 app.include_router(productos.router)
 app.include_router(servicios.router)
+app.include_router(mesas.router)
 app.include_router(reservas.router)
 app.include_router(pedidos.router)
 app.include_router(recuperacion.router)
+

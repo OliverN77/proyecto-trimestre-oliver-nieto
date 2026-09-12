@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom"
 import Input from "./ui/Input"
 import Button from "./ui/Button"
 
-const API_URL = import.meta.env.VITE_API_URL || "https://proyecto-trimestre.onrender.com/api"
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api"
 const DOCUMENT_PATTERN = /^\d{6,12}$/
 const PASSWORD_PATTERN = /^(?=.*[A-Za-z])(?=.*\d).{8,20}$/
 

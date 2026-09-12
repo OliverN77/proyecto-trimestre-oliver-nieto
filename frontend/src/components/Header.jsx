@@ -36,6 +36,13 @@ function Header() {
 
     if (location.pathname === "/admin" && usuario?.id_rol === 1) return null
 
+    function getDashboardUrl() {
+        if (!usuario) return "/"
+        if (usuario.id_rol === 1) return "/admin"
+        if (usuario.id_rol === 2) return "/empleado"
+        return "/panel"
+    }
+
     function cerrarSesion() {
         localStorage.removeItem("token")
         localStorage.removeItem("usuario")
@@ -93,6 +100,13 @@ function Header() {
 
                             {menuUsuarioOpen && (
                                 <div className="absolute right-0 mt-2 w-44 overflow-hidden rounded-xl border border-(--panna)/10 bg-(--notte-2) shadow-lg">
+                                    <Link
+                                        to={getDashboardUrl()}
+                                        onClick={() => setMenuUsuarioOpen(false)}
+                                        className="block w-full px-4 py-2.5 text-left text-sm font-medium text-(--panna) transition hover:bg-(--limone)/10 hover:text-(--limone)"
+                                    >
+                                        Ir al Panel
+                                    </Link>
                                     <button
                                         type="button"
                                         onClick={cerrarSesion}
@@ -136,9 +150,15 @@ function Header() {
                             </NavLink>
                         ))}
                         {usuario ? (
-                            <button type="button" onClick={cerrarSesion} className="mt-1 rounded-full bg-(--limone) px-4 py-2 text-center text-sm font-semibold text-(--notte-2) transition hover:bg-(--limone)/90">
-                                Hola, {usuario.nombre} · Salir
-                            </button>
+                            <div className="mt-1 flex flex-col gap-2 rounded-xl bg-(--panna)/5 p-3">
+                                <p className="text-center text-sm font-semibold text-(--panna)">Hola, {usuario.nombre}</p>
+                                <Link to={getDashboardUrl()} onClick={() => setMenuOpen(false)} className="rounded-full bg-(--limone)/20 px-4 py-2 text-center text-sm font-medium text-(--limone) transition hover:bg-(--limone)/30">
+                                    Ir al Panel
+                                </Link>
+                                <button type="button" onClick={cerrarSesion} className="rounded-full bg-(--limone) px-4 py-2 text-center text-sm font-semibold text-(--notte-2) transition hover:bg-(--limone)/90">
+                                    Salir
+                                </button>
+                            </div>
                         ) : (
                             <Link to="/login" onClick={() => setMenuOpen(false)} className="mt-1 rounded-full bg-(--limone) px-4 py-2 text-center text-sm font-semibold text-(--notte-2) transition hover:bg-(--limone)/90">
                                 Iniciar sesión
