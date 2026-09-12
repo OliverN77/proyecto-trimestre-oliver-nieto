@@ -43,7 +43,16 @@ async def cabeceras_seguridad(request: Request, call_next):
         response = await call_next(request)
     except Exception:
         logger.exception("Error inesperado en %s %s", request.method, request.url.path)
-        return JSONResponse(status_code=500, content={"detail": "Error interno del servidor"})
+        headers = {}
+        origin = request.headers.get("origin")
+        if origin in settings.cors_origins_list:
+            headers["Access-Control-Allow-Origin"] = origin
+            headers["Access-Control-Allow-Credentials"] = "true"
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Error interno del servidor"},
+            headers=headers,
+        )
     response.headers["X-Content-Type-Options"] = "nosniff"
     response.headers["X-Frame-Options"] = "DENY"
     response.headers["Referrer-Policy"] = "no-referrer"

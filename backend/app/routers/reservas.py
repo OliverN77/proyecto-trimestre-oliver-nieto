@@ -149,6 +149,7 @@ def crear_reserva(datos: ReservaCreate, usuario: Usuario = Depends(get_current_u
     datos_dump = datos.model_dump(exclude={"productos", "servicios"})
     reserva = Reserva(**datos_dump, id_cliente=usuario.id_usuario, estado="pendiente")
     db.add(reserva)
+    db.flush()
     
     if datos.productos:
         for prod in datos.productos:
