@@ -121,50 +121,57 @@ def mesas_disponibles(
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=ReservaOut, summary="Crea una reserva")
 def crear_reserva(datos: ReservaCreate, usuario: Usuario = Depends(get_current_user), db: Session = Depends(get_db)):
-    auto_completar_reservas_vencidas(db)
-    if datos.hora_fin <= datos.hora_inicio:
-        raise ConflictError("La hora de finalización debe ser posterior a la de inicio")
-    mesa = db.get(Mesa, datos.id_mesa)
-    if mesa is None or mesa.estado != "disponible" or mesa.capacidad < datos.cantidad_personas:
-        raise ConflictError("La mesa no está disponible")
+    try:
+        auto_completar_reservas_vencidas(db)
+        if datos.hora_fin <= datos.hora_inicio:
+            raise ConflictError("La hora de finalización debe ser posterior a la de inicio")
+        mesa = db.get(Mesa, datos.id_mesa)
+        if mesa is None or mesa.estado != "disponible" or mesa.capacidad < datos.cantidad_personas:
+            raise ConflictError("La mesa no está disponible")
     
-    # VIP Table Condition: must include at least 1 product and 1 service
-    if mesa.ubicacion and mesa.ubicacion.lower() == "vip":
-        has_prod = bool(datos.productos and len(datos.productos) >= 1)
-        has_serv = bool(datos.servicios and len(datos.servicios) >= 1)
-        if not (has_prod and has_serv):
-            raise ConflictError("Para reservar una mesa VIP es necesario incluir al menos 1 producto y 1 servicio.")
+        # VIP Table Condition: must include at least 1 product and 1 service
+        if mesa.ubicacion and mesa.ubicacion.lower() == "vip":
+            has_prod = bool(datos.productos and len(datos.productos) >= 1)
+            has_serv = bool(datos.servicios and len(datos.servicios) >= 1)
+            if not (has_prod and has_serv):
+                raise ConflictError("Para reservar una mesa VIP es necesario incluir al menos 1 producto y 1 servicio.")
 
-    overlap = db.scalar(
-        select(Reserva).where(
-            Reserva.id_mesa == datos.id_mesa,
-            Reserva.fecha_reserva == datos.fecha_reserva,
-            Reserva.estado.in_(["pendiente", "confirmada"]),
-            Reserva.hora_inicio < datos.hora_fin,
-            Reserva.hora_fin > datos.hora_inicio,
+        overlap = db.scalar(
+            select(Reserva).where(
+                Reserva.id_mesa == datos.id_mesa,
+                Reserva.fecha_reserva == datos.fecha_reserva,
+                Reserva.estado.in_(["pendiente", "confirmada"]),
+                Reserva.hora_inicio < datos.hora_fin,
+                Reserva.hora_fin > datos.hora_inicio,
+            )
         )
-    )
-    if overlap:
-        raise ConflictError("La mesa ya está reservada en ese horario")
-    datos_dump = datos.model_dump(exclude={"productos", "servicios"})
-    reserva = Reserva(**datos_dump, id_cliente=usuario.id_usuario, estado="pendiente")
-    db.add(reserva)
-    db.flush()
+        if overlap:
+            raise ConflictError("La mesa ya está reservada en ese horario")
+        datos_dump = datos.model_dump(exclude={"productos", "servicios"})
+        reserva = Reserva(**datos_dump, id_cliente=usuario.id_usuario, estado="pendiente")
+        db.add(reserva)
+        db.flush()
     
-    if datos.productos:
-        for prod in datos.productos:
-            rp = ReservaProducto(id_reserva=reserva.id_reserva, id_producto=prod.id_producto, cantidad=prod.cantidad)
-            reserva.productos.append(rp)
+        if datos.productos:
+            for prod in datos.productos:
+                rp = ReservaProducto(id_reserva=reserva.id_reserva, id_producto=prod.id_producto, cantidad=prod.cantidad)
+                reserva.productos.append(rp)
             
-    if datos.servicios:
-        for serv in datos.servicios:
-            rs = ReservaServicio(id_reserva=reserva.id_reserva, id_servicio=serv.id_servicio, cantidad=serv.cantidad)
-            reserva.servicios.append(rs)
+        if datos.servicios:
+            for serv in datos.servicios:
+                rs = ReservaServicio(id_reserva=reserva.id_reserva, id_servicio=serv.id_servicio, cantidad=serv.cantidad)
+                reserva.servicios.append(rs)
 
-    mesa.estado = "ocupada"
-    db.commit()
-    db.refresh(reserva)
-    return reserva_dict(reserva, mesa.numero_mesa)
+        mesa.estado = "ocupada"
+        db.commit()
+        db.refresh(reserva)
+        return reserva_dict(reserva, mesa.numero_mesa)
+    except ConflictError:
+        db.rollback()
+        raise
+    except Exception:
+        db.rollback()
+        raise
 
 
 

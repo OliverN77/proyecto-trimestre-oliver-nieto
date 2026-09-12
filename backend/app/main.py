@@ -43,7 +43,11 @@ async def cabeceras_seguridad(request: Request, call_next):
         response = await call_next(request)
     except Exception:
         logger.exception("Error inesperado en %s %s", request.method, request.url.path)
-        headers = {}
+        headers = {
+            "X-Content-Type-Options": "nosniff",
+            "X-Frame-Options": "DENY",
+            "Referrer-Policy": "no-referrer",
+        }
         origin = request.headers.get("origin")
         if origin in settings.cors_origins_list:
             headers["Access-Control-Allow-Origin"] = origin
