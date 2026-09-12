@@ -16,7 +16,7 @@ class Reserva(Base):
     hora_inicio: Mapped[time] = mapped_column(Time, nullable=False)
     hora_fin: Mapped[time] = mapped_column(Time, nullable=False)
     cantidad_personas: Mapped[int] = mapped_column(Integer, nullable=False)
-    estado: Mapped[str] = mapped_column(String(20), nullable=False, default="pendiente")
+    estado: Mapped[str] = mapped_column(String(32), nullable=False, default="pendiente")
     observaciones: Mapped[str | None] = mapped_column(Text)
     creada_en: Mapped[datetime] = mapped_column(default=datetime.utcnow, nullable=False)
 

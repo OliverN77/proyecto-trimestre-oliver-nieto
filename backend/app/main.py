@@ -6,6 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from app.core.config import settings
+from app.core.db_migrations import ensure_reserva_estado_column
 from app.core.exceptions import AuthorizationError, ConflictError, CredencialesInvalidasError, NotFoundError
 from app.routers import auth, mesas, pedidos, productos, recuperacion, reservas, servicios, usuarios
 
@@ -26,6 +27,9 @@ app = FastAPI(
         {"name": "Recuperación", "description": "Solicitudes de recuperación de acceso"},
     ],
 )
+
+
+ensure_reserva_estado_column()
 
 
 app.add_middleware(
