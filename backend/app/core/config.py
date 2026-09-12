@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str = "HS256"
     access_token_expire_minutes: int = 60
-    cors_origins: str = "http://localhost:5173"
+    cors_origins: str = "https://tabena-del-faro.vercel.app"
     recommendation_model_path: str = "modelos/recomendador.json"
     recommendation_provider_url: str = ""
     recommendation_provider_timeout: float = 2.0
