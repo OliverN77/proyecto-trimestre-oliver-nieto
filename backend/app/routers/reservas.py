@@ -3,6 +3,7 @@ from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, status
 from sqlalchemy import and_, select
+from sqlalchemy.orm import selectinload
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import AuthorizationError, ConflictError, NotFoundError
@@ -84,6 +85,10 @@ def mis_reservas(usuario: Usuario = Depends(get_current_user), db: Session = Dep
     auto_completar_reservas_vencidas(db)
     rows = db.execute(
         select(Reserva, Mesa.numero_mesa)
+        .options(
+            selectinload(Reserva.productos).selectinload(ReservaProducto.producto),
+            selectinload(Reserva.servicios).selectinload(ReservaServicio.servicio),
+        )
         .join(Mesa, Mesa.id_mesa == Reserva.id_mesa)
         .where(Reserva.id_cliente == usuario.id_usuario)
         .order_by(Reserva.fecha_reserva.desc(), Reserva.hora_inicio)
@@ -208,6 +213,10 @@ def todas_las_reservas(
 
     query = (
         select(Reserva, Mesa.numero_mesa, Usuario)
+        .options(
+            selectinload(Reserva.productos).selectinload(ReservaProducto.producto),
+            selectinload(Reserva.servicios).selectinload(ReservaServicio.servicio),
+        )
         .join(Mesa, Mesa.id_mesa == Reserva.id_mesa)
         .join(Usuario, Usuario.id_usuario == Reserva.id_cliente)
     )
