@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.exceptions import AuthorizationError, ConflictError, CredencialesInvalidasError, NotFoundError
-from app.routers import auth, mesas, pedidos, productos, recuperacion, reservas, servicios, usuarios
+from app.controllers import auth, mesas, pedidos, productos, recuperacion, reservas, servicios, usuarios
 
 logger = logging.getLogger("taberna_del_faro.api")
 
@@ -65,7 +65,7 @@ async def cabeceras_seguridad(request: Request, call_next):
 
 @app.exception_handler(NotFoundError)
 async def not_found_handler(request: Request, exc: NotFoundError):
-    return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": str(exc)})
+    return JSONResponse(status_code=status.HTTP_404_NOT_FOUND, content={"detail": str(exc), "path": request.url.path})
 
 
 @app.exception_handler(AuthorizationError)
@@ -93,7 +93,7 @@ async def validation_handler(request: Request, exc: RequestValidationError):
         {"campo": ".".join(str(parte) for parte in error["loc"]), "mensaje": error["msg"]}
         for error in exc.errors()
     ]
-    return JSONResponse(status_code=422, content={"detail": "Error de validación", "errores": errores})
+    return JSONResponse(status_code=422, content={"detail": "Error de validación", "errores": errores, "path": request.url.path})
 
 
 app.include_router(auth.router)

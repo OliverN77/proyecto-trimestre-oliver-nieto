@@ -1,13 +1,13 @@
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom"
 import Header from "./components/Header"
-import HomePage from "./pages/HomePage"
+import HomePage from "./views/HomePage"
 import Footer from "./components/Footer"
-import Login from "./pages/Login"
+import Login from "./views/Login"
 import RecoverPassword from "./components/RecoverPassword"
 import WhatsAppButton from "./components/WhatsAppButton"
-import RolePanel from "./pages/RolePanel"
-import AdminPage from "./pages/AdminPage"
-import EmployeePage from "./pages/EmployeePage"
+import RolePanel from "./views/RolePanel"
+import AdminPage from "./views/AdminPage"
+import EmployeePage from "./views/EmployeePage"
 
 // Routes that use their own full-page sidebar layout (no global Header/Footer)
 const PANEL_ROUTES = ["/admin", "/empleado", "/panel"]

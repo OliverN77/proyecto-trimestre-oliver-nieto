@@ -47,7 +47,7 @@ def test_validacion_http_conserva_detalle_por_campo(client: TestClient):
 
 
 def test_error_de_negocio_de_pedido_responde_409(client: TestClient, monkeypatch):
-    from app.routers import pedidos
+    from app.controllers import pedidos
 
     class User:
         id_usuario = 1
