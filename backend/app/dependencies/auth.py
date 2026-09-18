@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError
@@ -9,6 +11,7 @@ from app.database import get_db
 from app.models.usuario import Usuario
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
 
 
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> Usuario:
@@ -28,6 +31,23 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     usuario = db.scalar(select(Usuario).where(Usuario.correo == correo))
     if usuario is None or usuario.estado != "activo":
         raise credentials_exception
+    return usuario
+
+
+def get_current_user_optional(token: Optional[str] = Depends(oauth2_scheme_optional), db: Session = Depends(get_db)) -> Optional[Usuario]:
+    if not token:
+        return None
+    try:
+        payload = decode_access_token(token)
+        correo = payload.get("sub")
+        if not correo:
+            return None
+    except (JWTError, TypeError):
+        return None
+
+    usuario = db.scalar(select(Usuario).where(Usuario.correo == correo))
+    if usuario is None or usuario.estado != "activo":
+        return None
     return usuario
 
 

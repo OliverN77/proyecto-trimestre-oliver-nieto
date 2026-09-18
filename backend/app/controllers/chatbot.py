@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from app.core.config import settings
 from app.core.responses import API_RESPONSES
 from app.database import get_db
-from app.dependencies.auth import get_current_user
+from app.dependencies.auth import get_current_user_optional
 from app.models.conversacion import Conversacion
 from app.models.mensaje import Mensaje
 from app.models.usuario import Usuario
@@ -79,7 +79,7 @@ async def _get_ai_response(messages: list[dict]) -> str:
 @router.post("", response_model=ChatResponse, summary="Envía un mensaje al chatbot")
 async def enviar_mensaje(
     datos: ChatMessage,
-    usuario: Optional[Usuario] = Depends(get_current_user),
+    usuario: Optional[Usuario] = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
     # Get or create conversation
