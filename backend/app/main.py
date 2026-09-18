@@ -38,10 +38,17 @@ app = FastAPI(
 Base.metadata.create_all(bind=engine)
 
 # Asegurarse de que las columnas nuevas existan en reservas (Compatible con MySQL robusto)
-for col in ["subtotal", "impuestos", "total"]:
+columnas_migracion = {
+    "subtotal": "FLOAT NOT NULL DEFAULT 0.0",
+    "impuestos": "FLOAT NOT NULL DEFAULT 0.0",
+    "total": "FLOAT NOT NULL DEFAULT 0.0",
+    "id_empleado": "INTEGER DEFAULT NULL",
+}
+
+for col, definicion in columnas_migracion.items():
     try:
         with engine.begin() as conn:
-            conn.execute(text(f"ALTER TABLE reservas ADD COLUMN {col} FLOAT NOT NULL DEFAULT 0.0"))
+            conn.execute(text(f"ALTER TABLE reservas ADD COLUMN {col} {definicion}"))
     except Exception as e:
         # 1060 es el código de error de MySQL para "Duplicate column name"
         if "1060" not in str(e) and "Duplicate column" not in str(e):
