@@ -38,13 +38,20 @@ app = FastAPI(
 Base.metadata.create_all(bind=engine)
 
 # Asegurarse de que las columnas nuevas existan en reservas para bases de datos ya existentes
-with engine.begin() as conn:
-    try:
-        conn.execute(text("ALTER TABLE reservas ADD COLUMN IF NOT EXISTS subtotal FLOAT NOT NULL DEFAULT 0.0"))
-        conn.execute(text("ALTER TABLE reservas ADD COLUMN IF NOT EXISTS impuestos FLOAT NOT NULL DEFAULT 0.0"))
-        conn.execute(text("ALTER TABLE reservas ADD COLUMN IF NOT EXISTS total FLOAT NOT NULL DEFAULT 0.0"))
-    except Exception as e:
-        logger.warning(f"Aviso en migración de columnas: {e}")
+try:
+    with engine.connect() as conn:
+        # Verificar qué columnas ya existen
+        res = conn.execute(text("SELECT column_name FROM information_schema.columns WHERE table_name = 'reservas'"))
+        existing_cols = {row[0].lower() for row in res}
+        
+        # Añadir las que falten
+        for col in ["subtotal", "impuestos", "total"]:
+            if col not in existing_cols:
+                conn.execute(text(f"ALTER TABLE reservas ADD COLUMN {col} FLOAT NOT NULL DEFAULT 0.0"))
+        
+        conn.commit()
+except Exception as e:
+    logger.warning(f"Aviso en migración de columnas: {e}")
 
 
 app.add_middleware(
