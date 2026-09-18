@@ -8,6 +8,7 @@ import WhatsAppButton from "./components/WhatsAppButton"
 import RolePanel from "./views/RolePanel"
 import AdminPage from "./views/AdminPage"
 import EmployeePage from "./views/EmployeePage"
+import ChatBot from "./components/ChatBot"
 
 // Routes that use their own full-page sidebar layout (no global Header/Footer)
 const PANEL_ROUTES = ["/admin", "/empleado", "/panel"]
@@ -31,6 +32,7 @@ function AppLayout() {
       </main>
       {!isPanel && <Footer />}
       {!isPanel && <WhatsAppButton />}
+      <ChatBot token={localStorage.getItem("token")} />
     </div>
   )
 }

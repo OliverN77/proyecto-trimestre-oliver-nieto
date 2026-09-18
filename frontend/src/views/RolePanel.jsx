@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 import Sidebar from "../components/Sidebar"
+import DashboardCliente from "../components/DashboardCliente"
+import PQRModule from "../components/PQRModule"
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api"
 
@@ -526,8 +528,10 @@ function ReservationsList({ reservas, token, onActualizado }) {
 // ─── Client Panel ─────────────────────────────────────────────────────────────
 
 const CLIENT_SECTIONS = [
+    { id: "dashboard", label: "Dashboard", description: "Resumen de tu cuenta" },
     { id: "nueva", label: "Nueva reserva", description: "Reserva una mesa" },
     { id: "mias", label: "Mis reservas", description: "Historial de reservas" },
+    { id: "pqr", label: "Mis PQR", description: "Registra quejas o peticiones" },
 ]
 
 function ClientPanel() {
@@ -538,7 +542,7 @@ function ClientPanel() {
     const [servicios, setServicios] = useState([])
     const [reservas, setReservas] = useState([])
     const [error, setError] = useState("")
-    const [activeSection, setActiveSection] = useState("nueva")
+    const [activeSection, setActiveSection] = useState("dashboard")
 
     async function cargarReservas() {
         const response = await fetch(`${API_URL}/reservas/mias`, { headers: { Authorization: `Bearer ${token}` } })
@@ -599,6 +603,7 @@ function ClientPanel() {
             {error ? <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
 
             <div className="mt-6">
+                {activeSection === "dashboard" && <DashboardCliente token={token} />}
                 {activeSection === "nueva" && (
                     <ReservationWizard
                         token={token}
@@ -613,6 +618,7 @@ function ClientPanel() {
                 {activeSection === "mias" && (
                     <ReservationsList reservas={reservas} token={token} onActualizado={cargarReservas} />
                 )}
+                {activeSection === "pqr" && <PQRModule token={token} userRole={3} />}
             </div>
         </Sidebar>
     )

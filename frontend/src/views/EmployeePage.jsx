@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 import Sidebar from "../components/Sidebar"
+import DashboardEmpleado from "../components/DashboardEmpleado"
+import HistorialReservas from "../components/HistorialReservas"
+import PQRModule from "../components/PQRModule"
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000/api"
 
@@ -12,7 +15,10 @@ const STATUS_COLORS = {
 }
 
 const SECTIONS = [
+    { id: "dashboard", label: "Dashboard", description: "Métricas del día" },
     { id: "reservaciones", label: "Reservaciones", description: "Gestiona las reservas del restaurante" },
+    { id: "historial", label: "Historial", description: "Búsqueda avanzada de reservas pasadas" },
+    { id: "pqr", label: "PQR", description: "Gestión de quejas y reclamos" },
 ]
 
 // ─── Manage Dishes Modal ──────────────────────────────────────────────────────
@@ -313,7 +319,7 @@ export default function EmployeePage() {
     const navigate = useNavigate()
     const [productos, setProductos] = useState([])
     const [error, setError] = useState("")
-    const [activeSection, setActiveSection] = useState("reservaciones")
+    const [activeSection, setActiveSection] = useState("dashboard")
 
     useEffect(() => {
         let isMounted = true
@@ -350,14 +356,19 @@ export default function EmployeePage() {
             <div className="flex flex-wrap items-end justify-between gap-4">
                 <div>
                     <p className="text-xs uppercase tracking-[0.3em] text-(--terracotta)">Operación</p>
-                    <h2 className="mt-2 font-jost text-3xl font-semibold text-(--notte)">Reservaciones</h2>
+                    <h2 className="mt-2 font-jost text-3xl font-semibold text-(--notte)">
+                        {SECTIONS.find((s) => s.id === activeSection)?.label}
+                    </h2>
                 </div>
             </div>
 
             {error ? <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
 
             <div className="mt-6">
-                <ReservationsBoard token={token} catalogProductos={productos} />
+                {activeSection === "dashboard" && <DashboardEmpleado token={token} />}
+                {activeSection === "reservaciones" && <ReservationsBoard token={token} catalogProductos={productos} />}
+                {activeSection === "historial" && <HistorialReservas token={token} />}
+                {activeSection === "pqr" && <PQRModule token={token} userRole={2} />}
             </div>
         </Sidebar>
     )

@@ -2,10 +2,11 @@ from datetime import date, datetime, time, timedelta, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Query, status
-from sqlalchemy import and_, select
+from sqlalchemy import and_, func, select
 from sqlalchemy.orm import selectinload
 from sqlalchemy.orm import Session
 
+from app.core.config import settings
 from app.core.exceptions import AuthorizationError, ConflictError, NotFoundError
 from app.core.responses import API_RESPONSES
 from app.database import get_db
@@ -14,6 +15,7 @@ from app.models.mesa import Mesa
 from app.models.reserva import Reserva
 from app.models.reserva_producto import ReservaProducto
 from app.models.reserva_servicio import ReservaServicio
+from app.models.detalle_reserva import DetalleReserva
 from app.models.producto import Producto
 from app.models.servicio import Servicio
 from app.models.usuario import Usuario
@@ -44,6 +46,51 @@ def auto_completar_reservas_vencidas(db: Session):
         db.commit()
 
 
+def calcular_totales(db: Session, reserva: Reserva):
+    """Calculate subtotal, impuestos, total based on products and services."""
+    subtotal = 0.0
+
+    # Build detail records and calculate subtotal
+    db.execute(DetalleReserva.__table__.delete().where(DetalleReserva.id_reserva == reserva.id_reserva))
+
+    for rp in reserva.productos:
+        producto = db.get(Producto, rp.id_producto)
+        if producto:
+            item_subtotal = producto.precio * rp.cantidad
+            subtotal += item_subtotal
+            db.add(DetalleReserva(
+                id_reserva=reserva.id_reserva,
+                tipo="producto",
+                id_item=rp.id_producto,
+                descripcion=producto.nombre,
+                cantidad=rp.cantidad,
+                precio_unitario=producto.precio,
+                subtotal=item_subtotal,
+            ))
+
+    for rs in reserva.servicios:
+        servicio = db.get(Servicio, rs.id_servicio)
+        if servicio:
+            item_subtotal = servicio.precio * rs.cantidad
+            subtotal += item_subtotal
+            db.add(DetalleReserva(
+                id_reserva=reserva.id_reserva,
+                tipo="servicio",
+                id_item=rs.id_servicio,
+                descripcion=servicio.nombre,
+                cantidad=rs.cantidad,
+                precio_unitario=servicio.precio,
+                subtotal=item_subtotal,
+            ))
+
+    impuestos = round(subtotal * settings.tax_rate, 2)
+    total = round(subtotal + impuestos, 2)
+
+    reserva.subtotal = round(subtotal, 2)
+    reserva.impuestos = impuestos
+    reserva.total = total
+
+
 def reserva_dict(reserva, numero_mesa):
     productos = []
     if getattr(reserva, "productos", None) is not None:
@@ -64,7 +111,7 @@ def reserva_dict(reserva, numero_mesa):
             })
 
     return {
-        **{field: getattr(reserva, field) for field in ("id_reserva", "fecha_reserva", "hora_inicio", "hora_fin", "cantidad_personas", "id_mesa", "observaciones", "estado")},
+        **{field: getattr(reserva, field) for field in ("id_reserva", "fecha_reserva", "hora_inicio", "hora_fin", "cantidad_personas", "id_mesa", "observaciones", "estado", "subtotal", "impuestos", "total")},
         "numero_mesa": numero_mesa,
         "productos": productos,
         "servicios": servicios,
@@ -168,6 +215,7 @@ def crear_reserva(datos: ReservaCreate, usuario: Usuario = Depends(get_current_u
                 rs = ReservaServicio(id_reserva=reserva.id_reserva, id_servicio=serv.id_servicio, cantidad=serv.cantidad)
                 reserva.servicios.append(rs)
 
+        calcular_totales(db, reserva)
         mesa.estado = "ocupada"
         db.commit()
         db.refresh(reserva)
@@ -229,6 +277,57 @@ def todas_las_reservas(
 
     rows = db.execute(query).all()
     return [reserva_dict_con_cliente(reserva, numero_mesa, cliente) for reserva, numero_mesa, cliente in rows]
+
+
+# ─── Historial de reservas (Req 3) ─────────────────────────────────────────────
+
+@router.get("/historial", response_model=list[ReservaConCliente], summary="Historial de reservas con búsqueda avanzada")
+def historial_reservas(
+    fecha_inicio: Optional[date] = None,
+    fecha_fin: Optional[date] = None,
+    cliente: Optional[str] = None,
+    id_mesa: Optional[int] = None,
+    estado: Optional[str] = None,
+    valor_min: Optional[float] = None,
+    valor_max: Optional[float] = None,
+    usuario: Usuario = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if usuario.id_rol not in (1, 2):
+        raise AuthorizationError()
+
+    auto_completar_reservas_vencidas(db)
+
+    query = (
+        select(Reserva, Mesa.numero_mesa, Usuario)
+        .options(
+            selectinload(Reserva.productos).selectinload(ReservaProducto.producto),
+            selectinload(Reserva.servicios).selectinload(ReservaServicio.servicio),
+        )
+        .join(Mesa, Mesa.id_mesa == Reserva.id_mesa)
+        .join(Usuario, Usuario.id_usuario == Reserva.id_cliente)
+    )
+
+    if fecha_inicio:
+        query = query.where(Reserva.fecha_reserva >= fecha_inicio)
+    if fecha_fin:
+        query = query.where(Reserva.fecha_reserva <= fecha_fin)
+    if cliente:
+        query = query.where(
+            (Usuario.nombre.ilike(f"%{cliente}%")) | (Usuario.apellido.ilike(f"%{cliente}%"))
+        )
+    if id_mesa:
+        query = query.where(Reserva.id_mesa == id_mesa)
+    if estado:
+        query = query.where(Reserva.estado == estado)
+    if valor_min is not None:
+        query = query.where(Reserva.total >= valor_min)
+    if valor_max is not None:
+        query = query.where(Reserva.total <= valor_max)
+
+    query = query.order_by(Reserva.fecha_reserva.desc(), Reserva.hora_inicio)
+    rows = db.execute(query).all()
+    return [reserva_dict_con_cliente(reserva, numero_mesa, cli) for reserva, numero_mesa, cli in rows]
 
 
 @router.patch("/{id_reserva}/estado", response_model=ReservaOut, summary="Actualiza el estado de una reserva (empleado/admin)")
@@ -303,6 +402,7 @@ def crear_reserva_admin(datos: ReservaAdminCreate, usuario: Usuario = Depends(ge
     datos_dump = datos.model_dump(exclude={"productos", "servicios"})
     reserva = Reserva(**datos_dump, estado="confirmada")
     db.add(reserva)
+    db.flush()
     
     if datos.productos:
         for prod in datos.productos:
@@ -313,11 +413,11 @@ def crear_reserva_admin(datos: ReservaAdminCreate, usuario: Usuario = Depends(ge
         for serv in datos.servicios:
             rs = ReservaServicio(id_reserva=reserva.id_reserva, id_servicio=serv.id_servicio, cantidad=serv.cantidad)
             reserva.servicios.append(rs)
-            
+
+    calcular_totales(db, reserva)
+    mesa.estado = "ocupada"
     db.commit()
     db.refresh(reserva)
-    mesa.estado = "ocupada" # Mark table as occupied since we auto-confirm admin creations
-    db.commit()
     return reserva_dict_con_cliente(reserva, mesa.numero_mesa, cliente)
 
 @router.put("/admin/{id_reserva}", response_model=ReservaConCliente, summary="Actualiza una reserva (Admin)")
@@ -380,7 +480,10 @@ def actualizar_reserva_admin(id_reserva: int, datos: ReservaAdminCreate, usuario
         for serv in datos.servicios:
             db.add(ReservaServicio(id_reserva=id_reserva, id_servicio=serv.id_servicio, cantidad=serv.cantidad))
 
-            
+    db.flush()
+    # Reload relationships before calculating
+    db.refresh(reserva)
+    calcular_totales(db, reserva)
     db.commit()
     db.refresh(reserva)
     return reserva_dict_con_cliente(reserva, mesa.numero_mesa, cliente)
@@ -425,6 +528,9 @@ def actualizar_productos_reserva(
     for prod in productos:
         db.add(ReservaProducto(id_reserva=id_reserva, id_producto=prod.id_producto, cantidad=prod.cantidad))
 
+    db.flush()
+    db.refresh(reserva)
+    calcular_totales(db, reserva)
     db.commit()
     db.refresh(reserva)
     mesa = db.get(Mesa, reserva.id_mesa)

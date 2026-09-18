@@ -34,6 +34,12 @@ def reset():
         db.execute(text("SET FOREIGN_KEY_CHECKS = 0"))
 
         tablas = [
+            "mensajes",
+            "conversaciones",
+            "pqr",
+            "comprobantes_reserva",
+            "detalle_reservas",
+            "reserva_servicios",
             "reserva_productos",
             "reservas",
             "pedido_detalles",
@@ -43,8 +49,11 @@ def reset():
             "mesas",
         ]
         for tabla in tablas:
-            db.execute(text(f"TRUNCATE TABLE `{tabla}`"))
-            print(f"   [OK] TRUNCATE {tabla}")
+            try:
+                db.execute(text(f"TRUNCATE TABLE `{tabla}`"))
+                print(f"   [OK] TRUNCATE {tabla}")
+            except Exception as exc:
+                print(f"   [SKIP] {tabla} — {exc}")
 
         db.execute(text("SET FOREIGN_KEY_CHECKS = 1"))
 

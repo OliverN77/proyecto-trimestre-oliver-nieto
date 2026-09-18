@@ -2,6 +2,11 @@ import { useEffect, useState } from "react"
 import { Navigate, useNavigate } from "react-router-dom"
 import { API_URL, apiErrorMessage, readApiResponse } from "../api"
 import Sidebar from "../components/Sidebar"
+import DashboardAdmin from "../components/DashboardAdmin"
+import HistorialReservas from "../components/HistorialReservas"
+import ReportesDiarios from "../components/ReportesDiarios"
+import ComprobantesModule from "../components/ComprobantesModule"
+import PQRModule from "../components/PQRModule"
 
 const ROLE_NAMES = { 1: "Administrador", 2: "Empleado", 3: "Cliente" }
 
@@ -13,12 +18,17 @@ const STATUS_COLORS = {
 }
 
 const SECTIONS = [
+    { id: "dashboard", label: "Dashboard", description: "Métricas y gráficas de negocio" },
     { id: "usuarios", label: "Usuarios", description: "Consulta y administra las cuentas" },
     { id: "productos", label: "Productos", description: "Administra el menú y catálogo" },
     { id: "servicios", label: "Servicios", description: "Administra los servicios adicionales" },
     { id: "mesas", label: "Mesas", description: "Configura y administra las mesas del restaurante" },
     { id: "solicitudes", label: "Solicitudes", description: "Revisa recuperaciones" },
     { id: "reservaciones", label: "Reservaciones", description: "Gestiona todas las reservas" },
+    { id: "historial", label: "Historial", description: "Búsqueda avanzada de reservas pasadas" },
+    { id: "reportes", label: "Reportes", description: "Genera reportes diarios en PDF y Excel" },
+    { id: "comprobantes", label: "Comprobantes", description: "Emisión de comprobantes de reserva" },
+    { id: "pqr", label: "PQR", description: "Gestión de quejas y reclamos" },
 ]
 
 
@@ -1147,6 +1157,13 @@ export default function AdminPage() {
             ) : null}
 
             {/* ── Productos ── */}
+            {/* ── Nuevas Secciones ── */}
+            {activeSection === "dashboard" ? <DashboardAdmin token={token} /> : null}
+            {activeSection === "historial" ? <HistorialReservas token={token} /> : null}
+            {activeSection === "reportes" ? <ReportesDiarios token={token} /> : null}
+            {activeSection === "comprobantes" ? <ComprobantesModule token={token} userRole={1} /> : null}
+            {activeSection === "pqr" ? <PQRModule token={token} userRole={1} /> : null}
+
             {activeSection === "productos" ? (
                 <div className="mt-6">
                     <div className="mb-4 flex justify-end">

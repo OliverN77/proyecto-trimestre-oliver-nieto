@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.exceptions import AuthorizationError, ConflictError, CredencialesInvalidasError, NotFoundError
-from app.controllers import auth, mesas, pedidos, productos, recuperacion, reservas, servicios, usuarios
+from app.controllers import auth, chatbot, comprobantes, dashboard, mesas, pedidos, pqr, productos, recuperacion, reportes, reservas, servicios, usuarios
 
 logger = logging.getLogger("taberna_del_faro.api")
 
@@ -24,6 +24,11 @@ app = FastAPI(
         {"name": "Reservas", "description": "Reservas de mesas del restaurante"},
         {"name": "Pedidos", "description": "Pedidos de productos y servicios"},
         {"name": "Recuperación", "description": "Solicitudes de recuperación de acceso"},
+        {"name": "Reportes", "description": "Reportes diarios de reservas en PDF y Excel"},
+        {"name": "Comprobantes", "description": "Comprobantes de reserva"},
+        {"name": "Dashboard", "description": "Dashboards y analítica por roles"},
+        {"name": "PQR", "description": "Peticiones, Quejas y Reclamos"},
+        {"name": "Chatbot", "description": "Chatbot con Inteligencia Artificial"},
     ],
 )
 
@@ -104,4 +109,9 @@ app.include_router(mesas.router)
 app.include_router(reservas.router)
 app.include_router(pedidos.router)
 app.include_router(recuperacion.router)
+app.include_router(reportes.router)
+app.include_router(comprobantes.router)
+app.include_router(dashboard.router)
+app.include_router(pqr.router)
+app.include_router(chatbot.router)
 

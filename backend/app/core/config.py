@@ -16,6 +16,8 @@ class Settings(BaseSettings):
     recommendation_provider_url: str = ""
     recommendation_provider_timeout: float = 2.0
     recommendation_provider_retries: int = 2
+    openai_api_key: str = ""
+    tax_rate: float = 0.19
 
     model_config = SettingsConfigDict(env_file=".env", env_prefix="", extra="ignore")
 

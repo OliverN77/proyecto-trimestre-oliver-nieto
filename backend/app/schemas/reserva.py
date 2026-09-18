@@ -58,6 +58,9 @@ class ReservaOut(ReservaCreate):
     id_reserva: int
     estado: str
     numero_mesa: int
+    subtotal: float = 0.0
+    impuestos: float = 0.0
+    total: float = 0.0
     productos: list[ReservaProductoOut] = Field(default_factory=list)
     servicios: list[ReservaServicioOut] = Field(default_factory=list)
 
