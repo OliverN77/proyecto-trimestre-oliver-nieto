@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse
 from app.core.config import settings
 from app.core.exceptions import AuthorizationError, ConflictError, CredencialesInvalidasError, NotFoundError
 from app.controllers import auth, chatbot, comprobantes, dashboard, mesas, pedidos, pqr, productos, recuperacion, reportes, reservas, servicios, usuarios
+from app.database import Base, engine
 
 logger = logging.getLogger("taberna_del_faro.api")
 
@@ -31,6 +32,9 @@ app = FastAPI(
         {"name": "Chatbot", "description": "Chatbot con Inteligencia Artificial"},
     ],
 )
+
+# Auto-crear tablas faltantes (ej: conversaciones, pqr, comprobantes)
+Base.metadata.create_all(bind=engine)
 
 
 app.add_middleware(
