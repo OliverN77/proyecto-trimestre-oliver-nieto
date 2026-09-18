@@ -40,8 +40,8 @@ Responde siempre en español. Sé conciso pero amable. Si no sabes algo, sugiere
 
 
 async def _get_ai_response(messages: list[dict]) -> str:
-    """Call OpenAI API for a response. Falls back to a default if no API key."""
-    if not settings.openai_api_key:
+    """Call Groq API for a response. Falls back to a default if no API key."""
+    if not settings.groq_api_key:
         # Fallback: simple rule-based responses
         last_msg = messages[-1]["content"].lower() if messages else ""
         if any(word in last_msg for word in ["reserva", "reservar", "mesa"]):
@@ -63,16 +63,16 @@ async def _get_ai_response(messages: list[dict]) -> str:
 
     try:
         from openai import AsyncOpenAI
-        client = AsyncOpenAI(api_key=settings.openai_api_key)
+        client = AsyncOpenAI(api_key=settings.groq_api_key, base_url="https://api.groq.com/openai/v1")
         response = await client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="llama3-8b-8192",
             messages=[{"role": "system", "content": SYSTEM_PROMPT}] + messages,
             max_tokens=500,
             temperature=0.7,
         )
         return response.choices[0].message.content
     except Exception as e:
-        logger.error("Error calling OpenAI API: %s", e)
+        logger.error("Error calling Groq API: %s", e)
         return "Lo siento, estoy teniendo dificultades técnicas en este momento. Por favor intenta de nuevo en unos minutos o contacta directamente al restaurante. 🙏"
 
 

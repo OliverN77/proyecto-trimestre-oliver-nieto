@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 
 from app.core.exceptions import ConflictError, CredencialesInvalidasError, NotFoundError
@@ -122,7 +122,11 @@ def eliminar_usuario(db: Session, id_usuario: int) -> None:
 
 
 def autenticar_usuario(db: Session, correo: str, contrasena: str) -> Usuario:
-    usuario = db.scalar(select(Usuario).where(Usuario.correo == correo))
+    # Explicit prepared statement implementation to prevent SQL Injection
+    query = text("SELECT * FROM usuarios WHERE correo = :correo")
+    # Bind parameters securely (SQLAlchemy handles the actual parameterization with the DB driver)
+    usuario = db.scalars(select(Usuario).from_statement(query).params(correo=correo)).first()
+
     if usuario is None or not verify_password(contrasena, usuario.contrasena_hash):
         raise CredencialesInvalidasError()
     if usuario.estado != "activo":

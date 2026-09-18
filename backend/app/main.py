@@ -9,6 +9,7 @@ from app.core.config import settings
 from app.core.exceptions import AuthorizationError, ConflictError, CredencialesInvalidasError, NotFoundError
 from app.controllers import auth, chatbot, comprobantes, dashboard, mesas, pedidos, pqr, productos, recuperacion, reportes, reservas, servicios, usuarios
 from app.database import Base, engine
+from sqlalchemy import text
 
 logger = logging.getLogger("taberna_del_faro.api")
 
@@ -35,6 +36,15 @@ app = FastAPI(
 
 # Auto-crear tablas faltantes (ej: conversaciones, pqr, comprobantes)
 Base.metadata.create_all(bind=engine)
+
+# Asegurarse de que las columnas nuevas existan en reservas para bases de datos ya existentes
+with engine.begin() as conn:
+    try:
+        conn.execute(text("ALTER TABLE reservas ADD COLUMN IF NOT EXISTS subtotal FLOAT NOT NULL DEFAULT 0.0"))
+        conn.execute(text("ALTER TABLE reservas ADD COLUMN IF NOT EXISTS impuestos FLOAT NOT NULL DEFAULT 0.0"))
+        conn.execute(text("ALTER TABLE reservas ADD COLUMN IF NOT EXISTS total FLOAT NOT NULL DEFAULT 0.0"))
+    except Exception as e:
+        logger.warning(f"Aviso en migración de columnas: {e}")
 
 
 app.add_middleware(
