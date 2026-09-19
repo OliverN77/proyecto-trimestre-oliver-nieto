@@ -65,7 +65,7 @@ async def _get_ai_response(messages: list[dict]) -> str:
         from openai import AsyncOpenAI
         client = AsyncOpenAI(api_key=settings.groq_api_key, base_url="https://api.groq.com/openai/v1")
         response = await client.chat.completions.create(
-            model="llama-3.1-8b-instant",
+            model="mixtral-8x7b-32768",
             messages=[{"role": "system", "content": SYSTEM_PROMPT}] + messages,
             max_tokens=500,
             temperature=0.7,
