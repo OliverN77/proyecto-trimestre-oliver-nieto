@@ -213,7 +213,15 @@ function ReservationWizard({ token, onReservaCreada, productos = [], servicios =
                         <div>
                             <label style={{ display: "block", fontSize: "0.72rem", fontWeight: 700, letterSpacing: "0.06em", textTransform: "uppercase", color: "rgba(22,50,79,0.6)", marginBottom: "0.4rem" }}>Personas</label>
                             <input id="reserva-personas" type="number" min={1} max={8} placeholder="¿Cuántos?" value={form.cantidad_personas}
-                                onChange={(e) => setForm({ ...form, cantidad_personas: e.target.value })} className="input-base" />
+                                onChange={(e) => {
+                                    let val = e.target.value;
+                                    if (val !== "") {
+                                        let num = parseInt(val, 10);
+                                        if (num > 8) val = "8";
+                                        if (num < 1) val = "1";
+                                    }
+                                    setForm({ ...form, cantidad_personas: val })
+                                }} className="input-base" />
                         </div>
                     </div>
                     <button id="reserva-buscar-btn" type="button" onClick={buscarMesas} disabled={loading}
