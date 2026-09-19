@@ -75,6 +75,7 @@ export default function Login() {
                                 value={form.email}
                                 onChange={handleChange}
                                 autoFocus
+                                maxLength={50}
                             />
                             {error ? <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
                             <Button type="submit" variant="notte" fullWidth>
@@ -97,6 +98,7 @@ export default function Login() {
                                 value={form.password}
                                 onChange={handleChange}
                                 autoFocus
+                                maxLength={50}
                             />
 
                             <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-sm">
