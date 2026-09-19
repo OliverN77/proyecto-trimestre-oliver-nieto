@@ -154,7 +154,7 @@ export default function RegisterModal({ isOpen, onClose }) {
                 setSubmitError(data.detail || data.mensaje || "No se pudo completar el registro")
                 return
             }
-            setSuccess("Registro exitoso. Ya puedes iniciar sesión.")
+            setSuccess("Usuario registrado correctamente.")
             setForm(INITIAL_STATE)
             setTouched(INITIAL_TOUCHED)
         } catch {
@@ -167,6 +167,25 @@ export default function RegisterModal({ isOpen, onClose }) {
     function handleClose() {
         resetForm()
         onClose()
+    }
+
+    if (success) {
+        return (
+            <Modal isOpen={isOpen} onClose={handleClose} title="¡Registro Exitoso!">
+                <div className="py-6 text-center">
+                    <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+                        <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <h3 className="mb-2 font-jost text-2xl font-bold text-(--notte)">¡Bienvenido!</h3>
+                    <p className="mb-8 text-gray-600">{success}</p>
+                    <Button type="button" variant="notte" onClick={handleClose} fullWidth>
+                        Continuar
+                    </Button>
+                </div>
+            </Modal>
+        )
     }
 
     return (
@@ -262,7 +281,7 @@ export default function RegisterModal({ isOpen, onClose }) {
                             onChange={handleChange}
                             onBlur={handleBlur}
                             required
-                            maxLength={20}
+                            maxLength={50}
                             aria-invalid={Boolean(fieldError("email"))}
                         />
                     </FieldWrapper>
@@ -298,9 +317,6 @@ export default function RegisterModal({ isOpen, onClose }) {
 
                 {submitError ? (
                     <p className="mb-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{submitError}</p>
-                ) : null}
-                {success ? (
-                    <p className="mb-4 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">{success}</p>
                 ) : null}
 
                 <Button type="submit" variant="limone" fullWidth disabled={isSubmitting}>
