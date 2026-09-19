@@ -16,6 +16,7 @@ const PANEL_ROUTES = ["/admin", "/empleado", "/panel"]
 function AppLayout() {
   const { pathname } = useLocation()
   const isPanel = PANEL_ROUTES.some((route) => pathname.startsWith(route))
+  const showChatbot = pathname === "/" || pathname.startsWith("/panel")
 
   return (
     <div className="min-h-screen bg-panna text-inchiostro">
@@ -32,7 +33,7 @@ function AppLayout() {
       </main>
       {!isPanel && <Footer />}
       {!isPanel && <WhatsAppButton />}
-      <ChatBot token={localStorage.getItem("token")} />
+      {showChatbot && <ChatBot token={localStorage.getItem("token")} />}
     </div>
   )
 }
