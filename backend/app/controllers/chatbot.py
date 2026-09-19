@@ -64,8 +64,16 @@ async def _get_ai_response(messages: list[dict]) -> str:
     try:
         from openai import AsyncOpenAI
         client = AsyncOpenAI(api_key=settings.groq_api_key, base_url="https://api.groq.com/openai/v1")
+        
+        # Obtener dinámicamente un modelo disponible para evitar errores de obsolescencia
+        models_response = await client.models.list()
+        available_models = [m.id for m in models_response.data if "whisper" not in m.id]
+        if not available_models:
+            raise Exception("No text models available")
+        chosen_model = next((m for m in available_models if "llama" in m.lower()), available_models[0])
+
         response = await client.chat.completions.create(
-            model="mixtral-8x7b-32768",
+            model=chosen_model,
             messages=[{"role": "system", "content": SYSTEM_PROMPT}] + messages,
             max_tokens=500,
             temperature=0.7,
