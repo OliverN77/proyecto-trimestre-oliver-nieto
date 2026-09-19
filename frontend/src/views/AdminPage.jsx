@@ -46,6 +46,37 @@ function Modal({ children, onClose }) {
     )
 }
 
+function PaginationControls({ currentPage, totalPages, onPageChange }) {
+    if (totalPages <= 1) return null;
+    return (
+        <div className="flex items-center justify-between border-t border-gray-200 bg-white px-4 py-3 sm:px-6">
+            <div className="flex flex-1 justify-between sm:hidden">
+                <button disabled={currentPage === 1} onClick={() => onPageChange(currentPage - 1)} className="relative inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50">Anterior</button>
+                <button disabled={currentPage === totalPages} onClick={() => onPageChange(currentPage + 1)} className="relative ml-3 inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50">Siguiente</button>
+            </div>
+            <div className="hidden sm:flex sm:flex-1 sm:items-center sm:justify-between">
+                <div>
+                    <p className="text-sm text-gray-700">
+                        Página <span className="font-medium">{currentPage}</span> de <span className="font-medium">{totalPages}</span>
+                    </p>
+                </div>
+                <div>
+                    <nav className="isolate inline-flex -space-x-px rounded-md shadow-sm" aria-label="Pagination">
+                        <button disabled={currentPage === 1} onClick={() => onPageChange(currentPage - 1)} className="relative inline-flex items-center rounded-l-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50">
+                            <span className="sr-only">Anterior</span>
+                            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M12.79 5.23a.75.75 0 01-.02 1.06L8.832 10l3.938 3.71a.75.75 0 11-1.04 1.08l-4.5-4.25a.75.75 0 010-1.08l4.5-4.25a.75.75 0 011.06.02z" clipRule="evenodd" /></svg>
+                        </button>
+                        <button disabled={currentPage === totalPages} onClick={() => onPageChange(currentPage + 1)} className="relative inline-flex items-center rounded-r-md px-2 py-2 text-gray-400 ring-1 ring-inset ring-gray-300 hover:bg-gray-50 focus:z-20 focus:outline-offset-0 disabled:opacity-50">
+                            <span className="sr-only">Siguiente</span>
+                            <svg className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" /></svg>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    )
+}
+
 // ─── Reservation Board (Admin view with Full CRUD) ────────────────────────────
 
 function AdminReservationsBoard({ token, usuarios = [] }) {
@@ -581,6 +612,12 @@ export default function AdminPage() {
 
     const [activeSection, setActiveSection] = useState("usuarios")
     const [searchQuery, setSearchQuery] = useState("")
+    const [currentPage, setCurrentPage] = useState(1)
+    const ITEMS_PER_PAGE = 5
+
+    useEffect(() => {
+        setCurrentPage(1)
+    }, [searchQuery, activeSection])
 
     function handleSectionChange(section) {
         setActiveSection(section)
@@ -1072,7 +1109,11 @@ export default function AdminPage() {
 
 
             {/* ── Tabla de usuarios ── */}
-            {activeSection === "usuarios" ? (
+            {activeSection === "usuarios" ? (() => {
+                const filtered = usuarios.filter(u => `${u.nombre} ${u.apellido} ${u.correo} ${u.numero_documento}`.toLowerCase().includes(searchQuery.toLowerCase()))
+                const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1
+                const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+                return (
                 <div className="mt-6">
                     <div className="mb-4 flex justify-end">
                         <button type="button" onClick={abrirCrearUsuario} className="rounded-lg bg-(--notte) px-5 py-2.5 text-sm font-medium text-white shadow hover:bg-(--notte)/90 transition">
@@ -1085,9 +1126,7 @@ export default function AdminPage() {
                                 <tr><th className="p-4">Nombre</th><th className="p-4">Correo</th><th className="p-4">Rol</th><th className="p-4">Estado</th><th className="p-4">Acciones</th></tr>
                             </thead>
                             <tbody>
-                                {usuarios
-                                    .filter(u => `${u.nombre} ${u.apellido} ${u.correo} ${u.numero_documento}`.toLowerCase().includes(searchQuery.toLowerCase()))
-                                    .map((item) => (
+                                {paginated.map((item) => (
                                     <tr key={item.id_usuario} className="border-b border-(--notte)/10">
                                         <td className="p-4">{item.nombre} {item.apellido}</td>
                                         <td className="p-4">{item.correo}</td>
@@ -1108,12 +1147,17 @@ export default function AdminPage() {
                                 ))}
                             </tbody>
                         </table>
+                        <PaginationControls currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
                     </div>
                 </div>
-            ) : null}
+            )})() : null}
 
             {/* ── Servicios ── */}
-            {activeSection === "servicios" ? (
+            {activeSection === "servicios" ? (() => {
+                const filtered = servicios.filter(s => `${s.nombre} ${s.descripcion}`.toLowerCase().includes(searchQuery.toLowerCase()))
+                const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1
+                const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+                return (
                 <div className="mt-6">
                     <div className="mb-4 flex justify-end">
                         <button type="button" onClick={abrirCrearServicio} className="rounded-lg bg-(--notte) px-5 py-2.5 text-sm font-medium text-white shadow hover:bg-(--notte)/90 transition">
@@ -1126,9 +1170,7 @@ export default function AdminPage() {
                                 <tr><th className="p-4">ID</th><th className="p-4">Nombre</th><th className="p-4">Descripción</th><th className="p-4">Precio</th><th className="p-4">Estado</th><th className="p-4">Acciones</th></tr>
                             </thead>
                             <tbody>
-                                {servicios
-                                    .filter(s => `${s.nombre} ${s.descripcion}`.toLowerCase().includes(searchQuery.toLowerCase()))
-                                    .map((item) => (
+                                {paginated.map((item) => (
                                     <tr key={item.id_servicio} className="border-b border-(--notte)/10">
                                         <td className="p-4">{item.id_servicio}</td>
                                         <td className="p-4 font-semibold">{item.nombre}</td>
@@ -1152,9 +1194,10 @@ export default function AdminPage() {
                             </tbody>
                         </table>
                         {!servicios.length ? <p className="p-4 text-sm text-(--inchiostro)/60">No hay servicios registrados.</p> : null}
+                        {servicios.length > 0 && <PaginationControls currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
                     </div>
                 </div>
-            ) : null}
+            )})() : null}
 
             {/* ── Productos ── */}
             {/* ── Nuevas Secciones ── */}
@@ -1164,7 +1207,11 @@ export default function AdminPage() {
             {activeSection === "comprobantes" ? <ComprobantesModule token={token} userRole={1} /> : null}
             {activeSection === "pqr" ? <PQRModule token={token} userRole={1} /> : null}
 
-            {activeSection === "productos" ? (
+            {activeSection === "productos" ? (() => {
+                const filtered = productos.filter(p => `${p.nombre} ${p.descripcion}`.toLowerCase().includes(searchQuery.toLowerCase()))
+                const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1
+                const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+                return (
                 <div className="mt-6">
                     <div className="mb-4 flex justify-end">
                         <button type="button" onClick={abrirCrearProducto} className="rounded-lg bg-(--notte) px-5 py-2.5 text-sm font-medium text-white shadow hover:bg-(--notte)/90 transition">
@@ -1177,9 +1224,7 @@ export default function AdminPage() {
                                 <tr><th className="p-4">ID</th><th className="p-4">Nombre</th><th className="p-4">Precio</th><th className="p-4">Estado</th><th className="p-4">Acciones</th></tr>
                             </thead>
                             <tbody>
-                                {productos
-                                    .filter(p => `${p.nombre} ${p.descripcion}`.toLowerCase().includes(searchQuery.toLowerCase()))
-                                    .map((item) => (
+                                {paginated.map((item) => (
                                     <tr key={item.id_producto} className="border-b border-(--notte)/10">
                                         <td className="p-4">{item.id_producto}</td>
                                         <td className="p-4">{item.nombre}</td>
@@ -1194,12 +1239,17 @@ export default function AdminPage() {
                             </tbody>
                         </table>
                         {!productos.length ? <p className="p-4 text-sm text-(--inchiostro)/60">No hay productos.</p> : null}
+                        {productos.length > 0 && <PaginationControls currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
                     </div>
                 </div>
-            ) : null}
+            )})() : null}
 
             {/* ── Mesas ── */}
-            {activeSection === "mesas" ? (
+            {activeSection === "mesas" ? (() => {
+                const filtered = mesas.filter(m => `Mesa ${m.numero_mesa} ${m.ubicacion} ${m.capacidad}`.toLowerCase().includes(searchQuery.toLowerCase()))
+                const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1
+                const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+                return (
                 <div className="mt-6">
                     <div className="mb-4 flex justify-end">
                         <button type="button" onClick={abrirCrearMesa} className="rounded-lg bg-(--notte) px-5 py-2.5 text-sm font-medium text-white shadow hover:bg-(--notte)/90 transition">
@@ -1219,9 +1269,7 @@ export default function AdminPage() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {mesas
-                                    .filter(m => `Mesa ${m.numero_mesa} ${m.ubicacion} ${m.capacidad}`.toLowerCase().includes(searchQuery.toLowerCase()))
-                                    .map((item) => (
+                                {paginated.map((item) => (
                                     <tr key={item.id_mesa} className="border-b border-(--notte)/10">
                                         <td className="p-4 font-mono font-medium">{item.id_mesa}</td>
                                         <td className="p-4 font-semibold text-(--notte)">Mesa #{item.numero_mesa}</td>
@@ -1247,40 +1295,46 @@ export default function AdminPage() {
                             </tbody>
                         </table>
                         {!mesas.length ? <p className="p-4 text-sm text-(--inchiostro)/60">No hay mesas registradas.</p> : null}
+                        {mesas.length > 0 && <PaginationControls currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
                     </div>
                 </div>
-            ) : null}
+            )})() : null}
 
 
             {/* ── Solicitudes ── */}
-            {activeSection === "solicitudes" ? (
-                <div className="mt-6 rounded-xl bg-white p-6 shadow-faro">
-                    <h3 className="font-jost text-xl font-semibold text-(--notte)">Solicitudes de recuperación</h3>
-                    <div className="mt-4 space-y-3">
-                        {solicitudes
-                            .filter(s => `${s.nombre} ${s.apellido} ${s.correo} ${s.numero_documento}`.toLowerCase().includes(searchQuery.toLowerCase()))
-                            .map((solicitud) => (
-                            <div key={solicitud.id_solicitud} className="flex flex-wrap items-center justify-between gap-3 border-b border-(--notte)/10 pb-3">
-                                <div>
-                                    <p className="font-medium">{solicitud.nombre} {solicitud.apellido}</p>
-                                    <p className="text-sm text-(--inchiostro)/70">Documento: {solicitud.numero_documento} · Estado: {solicitud.estado}</p>
+            {activeSection === "solicitudes" ? (() => {
+                const filtered = solicitudes.filter(s => `${s.nombre} ${s.apellido} ${s.correo} ${s.numero_documento}`.toLowerCase().includes(searchQuery.toLowerCase()))
+                const totalPages = Math.ceil(filtered.length / ITEMS_PER_PAGE) || 1
+                const paginated = filtered.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE)
+                return (
+                <div className="mt-6 rounded-xl bg-white shadow-faro">
+                    <div className="p-6">
+                        <h3 className="font-jost text-xl font-semibold text-(--notte)">Solicitudes de recuperación</h3>
+                        <div className="mt-4 space-y-3">
+                            {paginated.map((solicitud) => (
+                                <div key={solicitud.id_solicitud} className="flex flex-wrap items-center justify-between gap-3 border-b border-(--notte)/10 pb-3">
+                                    <div>
+                                        <p className="font-medium">{solicitud.nombre} {solicitud.apellido}</p>
+                                        <p className="text-sm text-(--inchiostro)/70">Documento: {solicitud.numero_documento} · Estado: {solicitud.estado}</p>
+                                    </div>
+                                    <div className="flex gap-2">
+                                        {solicitud.estado === "pendiente" ? (
+                                            <>
+                                                <button type="button" onClick={() => resolverSolicitud(solicitud.id_solicitud, "aprobada")} className="rounded bg-(--oliva) px-3 py-2 text-sm text-white">Aprobar</button>
+                                                <button type="button" onClick={() => resolverSolicitud(solicitud.id_solicitud, "rechazada")} className="rounded bg-red-700 px-3 py-2 text-sm text-white">Rechazar</button>
+                                            </>
+                                        ) : (
+                                            <button type="button" onClick={() => eliminarSolicitud(solicitud.id_solicitud)} className="rounded bg-red-700 px-3 py-2 text-sm text-white">Eliminar</button>
+                                        )}
+                                    </div>
                                 </div>
-                                <div className="flex gap-2">
-                                    {solicitud.estado === "pendiente" ? (
-                                        <>
-                                            <button type="button" onClick={() => resolverSolicitud(solicitud.id_solicitud, "aprobada")} className="rounded bg-(--oliva) px-3 py-2 text-sm text-white">Aprobar</button>
-                                            <button type="button" onClick={() => resolverSolicitud(solicitud.id_solicitud, "rechazada")} className="rounded bg-red-700 px-3 py-2 text-sm text-white">Rechazar</button>
-                                        </>
-                                    ) : (
-                                        <button type="button" onClick={() => eliminarSolicitud(solicitud.id_solicitud)} className="rounded bg-red-700 px-3 py-2 text-sm text-white">Eliminar</button>
-                                    )}
-                                </div>
-                            </div>
-                        ))}
+                            ))}
+                        </div>
+                        {!solicitudes.length ? <p className="mt-3 text-sm text-(--inchiostro)/60">No hay solicitudes.</p> : null}
                     </div>
-                    {!solicitudes.length ? <p className="mt-3 text-sm text-(--inchiostro)/60">No hay solicitudes.</p> : null}
+                    {solicitudes.length > 0 && <PaginationControls currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />}
                 </div>
-            ) : null}
+            )})() : null}
 
             {/* ── Reservaciones ── */}
             {activeSection === "reservaciones" ? (
