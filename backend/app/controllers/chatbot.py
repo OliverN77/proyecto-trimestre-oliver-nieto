@@ -67,10 +67,20 @@ async def _get_ai_response(messages: list[dict]) -> str:
         
         # Obtener dinámicamente un modelo disponible para evitar errores de obsolescencia
         models_response = await client.models.list()
-        available_models = [m.id for m in models_response.data if "whisper" not in m.id]
+        # Filtramos modelos de audio (whisper), moderación (guard) o visión (vision)
+        available_models = [
+            m.id for m in models_response.data 
+            if "whisper" not in m.id and "guard" not in m.id and "vision" not in m.id
+        ]
+        
         if not available_models:
-            raise Exception("No text models available")
-        chosen_model = next((m for m in available_models if "llama" in m.lower()), available_models[0])
+            raise Exception("No conversational text models available")
+            
+        # Preferir Llama, luego Mixtral, o usar el primero disponible
+        chosen_model = next(
+            (m for m in available_models if "llama" in m.lower()), 
+            next((m for m in available_models if "mixtral" in m.lower()), available_models[0])
+        )
 
         response = await client.chat.completions.create(
             model=chosen_model,
