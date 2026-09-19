@@ -65,7 +65,7 @@ async def _get_ai_response(messages: list[dict]) -> str:
         from openai import AsyncOpenAI
         client = AsyncOpenAI(api_key=settings.groq_api_key, base_url="https://api.groq.com/openai/v1")
         response = await client.chat.completions.create(
-            model="llama3-8b-8192",
+            model="llama-3.1-8b-instant",
             messages=[{"role": "system", "content": SYSTEM_PROMPT}] + messages,
             max_tokens=500,
             temperature=0.7,
@@ -73,7 +73,7 @@ async def _get_ai_response(messages: list[dict]) -> str:
         return response.choices[0].message.content
     except Exception as e:
         logger.error("Error calling Groq API: %s", e)
-        return f"Lo siento, estoy teniendo dificultades técnicas en este momento. Por favor intenta de nuevo en unos minutos o contacta directamente al restaurante. 🙏 (Error interno para depuración: {str(e)})"
+        return f"Lo siento, estoy teniendo dificultades técnicas en este momento. Por favor intenta de nuevo en unos minutos o contacta directamente al restaurante."
 
 
 @router.post("", response_model=ChatResponse, summary="Envía un mensaje al chatbot")
