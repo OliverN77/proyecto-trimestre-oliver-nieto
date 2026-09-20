@@ -91,7 +91,7 @@ async def _get_ai_response(messages: list[dict]) -> str:
         return response.choices[0].message.content
     except Exception as e:
         logger.error("Error calling Groq API: %s", e)
-        return f"Lo siento, estoy teniendo dificultades técnicas en este momento. Por favor intenta de nuevo en unos minutos o contacta directamente al restaurante. 🙏 (Error interno para depuración: {str(e)})"
+        return f"Lo siento, estoy teniendo dificultades técnicas en este momento. Por favor intenta de nuevo en unos minutos o contacta directamente al restaurante. 🙏"
 
 
 @router.post("", response_model=ChatResponse, summary="Envía un mensaje al chatbot")
