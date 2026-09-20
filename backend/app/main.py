@@ -7,7 +7,7 @@ from fastapi.responses import JSONResponse
 
 from app.core.config import settings
 from app.core.exceptions import AuthorizationError, ConflictError, CredencialesInvalidasError, NotFoundError
-from app.controllers import auth, chatbot, comprobantes, dashboard, mesas, pedidos, pqr, productos, recuperacion, reportes, reservas, servicios, usuarios
+from app.controllers import auth, chatbot, comprobantes, dashboard, mesas, pqr, productos, recuperacion, reportes, reservas, servicios, usuarios
 from app.database import Base, engine
 from sqlalchemy import text
 
@@ -24,7 +24,6 @@ app = FastAPI(
         {"name": "Servicios", "description": "Servicios adicionales del restaurante"},
         {"name": "Mesas", "description": "Gestión de mesas para reservaciones"},
         {"name": "Reservas", "description": "Reservas de mesas del restaurante"},
-        {"name": "Pedidos", "description": "Pedidos de productos y servicios"},
         {"name": "Recuperación", "description": "Solicitudes de recuperación de acceso"},
         {"name": "Reportes", "description": "Reportes diarios de reservas en PDF y Excel"},
         {"name": "Comprobantes", "description": "Comprobantes de reserva"},
@@ -129,7 +128,6 @@ app.include_router(productos.router)
 app.include_router(servicios.router)
 app.include_router(mesas.router)
 app.include_router(reservas.router)
-app.include_router(pedidos.router)
 app.include_router(recuperacion.router)
 app.include_router(reportes.router)
 app.include_router(comprobantes.router)

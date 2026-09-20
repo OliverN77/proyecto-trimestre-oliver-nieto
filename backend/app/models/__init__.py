@@ -1,5 +1,4 @@
 from app.models.producto import Producto
-from app.models.pedido import Pedido, PedidoDetalle
 from app.models.reserva import Reserva
 from app.models.reserva_producto import ReservaProducto
 from app.models.reserva_servicio import ReservaServicio
@@ -21,8 +20,6 @@ __all__ = [
     "Mensaje",
     "Mesa",
     "PQR",
-    "Pedido",
-    "PedidoDetalle",
     "Producto",
     "Reserva",
     "ReservaProducto",
