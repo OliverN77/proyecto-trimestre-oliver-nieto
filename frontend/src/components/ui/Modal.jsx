@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 
-export default function Modal({ isOpen, onClose, title, children }) {
+export default function Modal({ isOpen, onClose, title, children, closeOnOutsideClick = true }) {
     useEffect(() => {
         if (!isOpen) {
             return undefined
@@ -30,7 +30,7 @@ export default function Modal({ isOpen, onClose, title, children }) {
     return (
         <div
             className="fixed inset-0 z-50 flex items-center justify-center bg-(--notte-2)/70 px-4 backdrop-blur-sm"
-            onClick={onClose}
+            onClick={closeOnOutsideClick ? onClose : undefined}
         >
             <div
                 className="relative max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl bg-(--panna) p-6 shadow-faro sm:p-8"

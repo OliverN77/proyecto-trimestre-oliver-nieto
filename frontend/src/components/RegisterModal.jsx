@@ -174,7 +174,7 @@ export default function RegisterModal({ isOpen, onClose }) {
 
     if (success) {
         return (
-            <Modal isOpen={isOpen} onClose={handleClose} title="¡Registro Exitoso!">
+            <Modal isOpen={isOpen} onClose={handleClose} title="¡Registro Exitoso!" closeOnOutsideClick={false}>
                 <div className="py-6 text-center">
                     <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
                         <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -192,7 +192,7 @@ export default function RegisterModal({ isOpen, onClose }) {
     }
 
     return (
-        <Modal isOpen={isOpen} onClose={handleClose} title="Crear una cuenta">
+        <Modal isOpen={isOpen} onClose={handleClose} title="Crear una cuenta" closeOnOutsideClick={false}>
             <form noValidate onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                     <FieldWrapper error={fieldError("nombre")}>
