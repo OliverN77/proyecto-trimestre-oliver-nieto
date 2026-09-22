@@ -45,21 +45,24 @@ const INITIAL_TOUCHED = {
 function validateField(name, value, form) {
     switch (name) {
         case "nombre":
-            return value.trim() ? "" : "El nombre es obligatorio"
+            if (!value.trim()) return "El nombre es obligatorio (máx. 20 caracteres)"
+            return value.length > 20 ? "Máximo 20 caracteres" : ""
         case "apellido":
-            return value.trim() ? "" : "El apellido es obligatorio"
+            if (!value.trim()) return "El apellido es obligatorio (máx. 20 caracteres)"
+            return value.length > 20 ? "Máximo 20 caracteres" : ""
         case "tipoDocumento":
             return value ? "" : "Selecciona un tipo de documento"
         case "numeroDocumento":
             if (!value) return "El número de documento es obligatorio"
             return DOCUMENT_PATTERN.test(value) ? "" : "Debe tener entre 6 y 12 dígitos"
         case "direccion":
-            return ""
+            return value.length > 50 ? "Máximo 50 caracteres" : ""
         case "telefono":
             if (!value) return "El teléfono es obligatorio"
             return PHONE_PATTERN.test(value) ? "" : "Debe tener entre 7 y 10 dígitos"
         case "email":
-            if (!value) return "El correo es obligatorio"
+            if (!value) return "El correo es obligatorio (máx. 50 caracteres)"
+            if (value.length > 50) return "Máximo 50 caracteres"
             return EMAIL_PATTERN.test(value) ? "" : "Escribe un correo electrónico válido"
         case "password":
             if (!value) return "La contraseña es obligatoria"
@@ -233,6 +236,7 @@ export default function RegisterModal({ isOpen, onClose }) {
 
                     <FieldWrapper error={fieldError("numeroDocumento")}>
                         <Input
+                            type="number"
                             label="Número de documento"
                             name="numeroDocumento"
                             value={form.numeroDocumento}
@@ -260,6 +264,7 @@ export default function RegisterModal({ isOpen, onClose }) {
                 <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                     <FieldWrapper error={fieldError("telefono")}>
                         <Input
+                            type="number"
                             label="Teléfono"
                             name="telefono"
                             value={form.telefono}

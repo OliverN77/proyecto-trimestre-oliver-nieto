@@ -3,7 +3,6 @@ import { Link, NavLink, useLocation, useNavigate } from "react-router-dom"
 
 const links = [
     { to: "/", label: "Inicio" },
-    { to: "/login", label: "Login" },
 ]
 
 function Header() {

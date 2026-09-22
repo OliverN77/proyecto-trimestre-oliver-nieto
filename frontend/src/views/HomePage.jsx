@@ -53,8 +53,7 @@ export default function HomePage() {
                         Taberna <span className="italic text-(--limone)">del Faro</span>
                     </h1>
                     <p className="mt-6 max-w-2xl text-base leading-7 text-(--panna)/80 sm:text-lg">
-                        Cocina marinera en una terraza suspendida entre las rocas y el golfo.
-                        Un espacio sobrio, cálido y pensado para que la experiencia sea visual y funcional.
+                        Inicia sesión para reservar tu mesa y disfrutar de nuestra cocina marinera en una terraza suspendida entre las rocas y el golfo.
                     </p>
                     <div className="mt-10 flex flex-wrap justify-center gap-3">
                         <a
