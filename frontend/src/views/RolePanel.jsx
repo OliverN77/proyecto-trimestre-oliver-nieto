@@ -12,6 +12,10 @@ const STATUS_LABELS = { pendiente: "Pendiente", confirmada: "Confirmada", comple
 
 const UBICACION_ICON = { "terraza": "🌿", "ventana": "🌅", "interior": "🕯️", "jardín": "🌸", "bar": "🍷" }
 
+function formatCurrency(amount) {
+    return Number(amount).toLocaleString("es-CO", { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+}
+
 function getUbicacionIcon(ubicacion) {
     if (!ubicacion) return "🍽️"
     const key = ubicacion.toLowerCase()
@@ -282,7 +286,7 @@ function ReservationWizard({ token, onReservaCreada, productos = [], servicios =
                                     <div key={`reserva-prod-${producto.id_producto}`} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.75rem", borderRadius: "0.5rem", border: "1px solid rgba(22,50,79,0.1)" }}>
                                         <div>
                                             <p style={{ fontWeight: 600, fontSize: "0.875rem", color: "var(--notte)", margin: 0 }}>{producto.nombre}</p>
-                                            <p style={{ fontSize: "0.75rem", color: "rgba(36,27,18,0.6)", margin: 0 }}>${producto.precio}</p>
+                                            <p style={{ fontSize: "0.75rem", color: "rgba(36,27,18,0.6)", margin: 0 }}>${formatCurrency(producto.precio)}</p>
                                         </div>
                                         <button type="button" onClick={() => togglePlato(producto)} style={{ padding: "0.25rem 0.75rem", borderRadius: "0.3rem", background: "rgba(107,124,78,0.12)", color: "var(--oliva)", border: "none", cursor: "pointer", fontWeight: 600, fontSize: "0.75rem" }}>+ Añadir</button>
                                     </div>
@@ -305,8 +309,8 @@ function ReservationWizard({ token, onReservaCreada, productos = [], servicios =
                                         </div>
                                     ))}
                                     <div style={{ marginTop: "0.75rem", paddingTop: "0.5rem", borderTop: "1px solid rgba(22,50,79,0.1)", fontWeight: 700, fontSize: "0.85rem", color: "var(--notte)", display: "flex", justifyContent: "space-between" }}>
-                                        <span>Subtotal</span>
-                                        <span>${platosSeleccionados.reduce((acc, p) => acc + p.cantidad * p.precio, 0).toFixed(2)}</span>
+                                        <span>Subtotal platos</span>
+                                        <span>${formatCurrency(platosSeleccionados.reduce((acc, p) => acc + p.cantidad * p.precio, 0))}</span>
                                     </div>
                                 </div>
                             )}
@@ -324,7 +328,7 @@ function ReservationWizard({ token, onReservaCreada, productos = [], servicios =
                                             <div key={`reserva-serv-${servicio.id_servicio}`} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0.75rem", borderRadius: "0.5rem", border: "1px solid rgba(22,50,79,0.1)" }}>
                                                 <div>
                                                     <p style={{ fontWeight: 600, fontSize: "0.875rem", color: "var(--notte)", margin: 0 }}>{servicio.nombre}</p>
-                                                    <p style={{ fontSize: "0.75rem", color: "rgba(36,27,18,0.6)", margin: 0 }}>{servicio.descripcion} — ${servicio.precio}</p>
+                                                    <p style={{ fontSize: "0.75rem", color: "rgba(36,27,18,0.6)", margin: 0 }}>{servicio.descripcion} — ${formatCurrency(servicio.precio)}</p>
                                                 </div>
                                                 <button type="button" onClick={() => toggleServicio(servicio)} style={{ padding: "0.25rem 0.75rem", borderRadius: "0.3rem", background: "rgba(22,50,79,0.1)", color: "var(--notte)", border: "none", cursor: "pointer", fontWeight: 600, fontSize: "0.75rem" }}>+ Añadir</button>
                                             </div>
@@ -346,11 +350,27 @@ function ReservationWizard({ token, onReservaCreada, productos = [], servicios =
                                                     <button type="button" onClick={() => removeServicio(s.id_servicio)} style={{ background: "none", border: "none", color: "var(--terracotta)", cursor: "pointer", fontSize: "0.75rem", padding: "0.2rem" }}>✕</button>
                                                 </div>
                                             ))}
+                                            <div style={{ marginTop: "0.75rem", paddingTop: "0.5rem", borderTop: "1px solid rgba(22,50,79,0.1)", fontWeight: 700, fontSize: "0.85rem", color: "var(--notte)", display: "flex", justifyContent: "space-between" }}>
+                                                <span>Subtotal servicios</span>
+                                                <span>${formatCurrency(serviciosSeleccionados.reduce((acc, s) => acc + s.cantidad * s.precio, 0))}</span>
+                                            </div>
                                         </div>
                                     )}
                                 </div>
                             </div>
                         </>
+                    )}
+
+                    {(platosSeleccionados.length > 0 || serviciosSeleccionados.length > 0) && (
+                        <div style={{ background: "rgba(232,178,61,0.15)", border: "1px solid rgba(232,178,61,0.3)", borderRadius: "0.75rem", padding: "1rem", marginBottom: "1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <span style={{ fontWeight: 700, fontSize: "0.9rem", color: "var(--notte)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Total pre-orden</span>
+                            <span style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--notte)" }}>
+                                ${formatCurrency(
+                                    platosSeleccionados.reduce((acc, p) => acc + p.cantidad * p.precio, 0) + 
+                                    serviciosSeleccionados.reduce((acc, s) => acc + s.cantidad * s.precio, 0)
+                                )}
+                            </span>
+                        </div>
                     )}
 
                     <button id="reserva-siguiente-btn-2" type="button" onClick={() => { setError(""); setStep(4) }}
@@ -383,7 +403,7 @@ function ReservationWizard({ token, onReservaCreada, productos = [], servicios =
                                 {platosSeleccionados.map((p) => (
                                     <li key={`conf-prod-${p.id_producto}`} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", color: "var(--notte)" }}>
                                         <span><strong style={{ opacity: 0.7 }}>{p.cantidad}x</strong> {p.nombre}</span>
-                                        <span style={{ fontWeight: 600 }}>${(p.cantidad * p.precio).toFixed(2)}</span>
+                                        <span style={{ fontWeight: 600 }}>${formatCurrency(p.cantidad * p.precio)}</span>
                                     </li>
                                 ))}
                             </ul>
@@ -396,10 +416,21 @@ function ReservationWizard({ token, onReservaCreada, productos = [], servicios =
                                 {serviciosSeleccionados.map((s) => (
                                     <li key={`conf-serv-${s.id_servicio}`} style={{ display: "flex", justifyContent: "space-between", fontSize: "0.85rem", color: "var(--notte)" }}>
                                         <span><strong style={{ opacity: 0.7 }}>{s.cantidad}x</strong> {s.nombre}</span>
-                                        <span style={{ fontWeight: 600 }}>${(s.cantidad * s.precio).toFixed(2)}</span>
+                                        <span style={{ fontWeight: 600 }}>${formatCurrency(s.cantidad * s.precio)}</span>
                                     </li>
                                 ))}
                             </ul>
+                        </div>
+                    )}
+                    {(platosSeleccionados.length > 0 || serviciosSeleccionados.length > 0) && (
+                        <div style={{ background: "rgba(232,178,61,0.15)", borderRadius: "0.75rem", padding: "1rem", marginBottom: "1.25rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                            <span style={{ fontWeight: 700, fontSize: "0.85rem", color: "var(--notte)", textTransform: "uppercase", letterSpacing: "0.05em" }}>Total pre-orden</span>
+                            <span style={{ fontWeight: 700, fontSize: "1.1rem", color: "var(--notte)" }}>
+                                ${formatCurrency(
+                                    platosSeleccionados.reduce((acc, p) => acc + p.cantidad * p.precio, 0) + 
+                                    serviciosSeleccionados.reduce((acc, s) => acc + s.cantidad * s.precio, 0)
+                                )}
+                            </span>
                         </div>
                     )}
                     <div>
