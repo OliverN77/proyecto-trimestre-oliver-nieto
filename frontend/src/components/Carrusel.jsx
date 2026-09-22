@@ -28,7 +28,7 @@ export default function Carrusel() {
         <section className="bg-(--notte-2) px-4 py-10 sm:px-6 lg:px-8 lg:py-14">
             <div className="mx-auto max-w-6xl">
                 <div className="mb-6 text-center text-(--panna)">
-                    <p className="text-xs uppercase tracking-[0.35em] text-(--limone)/90">Carrusel</p>
+                    <p className="text-xs uppercase tracking-[0.35em] text-(--limone)/90">Menú</p>
                     <h1 className="mt-3 font-jost text-3xl font-semibold sm:text-4xl">Selección de platos y ambiente</h1>
                 </div>
 

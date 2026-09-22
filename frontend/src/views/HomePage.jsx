@@ -60,7 +60,7 @@ export default function HomePage() {
                             href="#carrusel"
                             className="rounded-full bg-(--limone) px-6 py-3 text-sm font-semibold text-(--notte-2) transition hover:bg-(--limone)/90"
                         >
-                            Ver carrusel
+                            Explorar menú
                         </a>
                         <Link
                             to="/login"
