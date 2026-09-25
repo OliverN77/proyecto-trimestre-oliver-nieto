@@ -529,6 +529,7 @@ export default function AdminPage() {
     
     // User Modal State
     const [isUserModalOpen, setIsUserModalOpen] = useState(false)
+    const [isSubmitting, setIsSubmitting] = useState(false)
     const [editingId, setEditingId] = useState(null)
     const [form, setForm] = useState({
         nombre: "", apellido: "", tipo_documento: "CC", numero_documento: "",
@@ -688,10 +689,18 @@ export default function AdminPage() {
 
     async function guardarUsuario(event) {
         event.preventDefault()
+        setIsSubmitting(true)
         const method = editingId ? "PUT" : "POST"
         const url = editingId ? `${API_URL}/usuarios/${editingId}` : `${API_URL}/usuarios`
-        const response = await fetch(url, { method, headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(form) })
+        
+        const payload = { ...form }
+        if (editingId && !payload.contrasena) {
+            delete payload.contrasena
+        }
+
+        const response = await fetch(url, { method, headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` }, body: JSON.stringify(payload) })
         const data = await readApiResponse(response)
+        setIsSubmitting(false)
         if (!response.ok) {
             setError(apiErrorMessage(data, "No se pudo guardar el usuario"))
             return
@@ -967,8 +976,7 @@ export default function AdminPage() {
                 </div>
             </div>
 
-            {error ? <p className="mt-4 rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p> : null}
-            {mensaje ? <p className="mt-4 rounded-lg bg-green-50 px-3 py-2 text-sm text-green-700">{mensaje}</p> : null}
+
 
             {/* ── User Modal ── */}
             {isUserModalOpen && (
@@ -988,7 +996,9 @@ export default function AdminPage() {
                         </div>
                         <div className="mt-6 flex justify-end gap-3">
                             <button type="button" onClick={() => setIsUserModalOpen(false)} className="rounded-lg border border-gray-300 px-5 py-2.5 font-medium text-gray-700 hover:bg-gray-50">Cancelar</button>
-                            <button type="submit" className="rounded-lg bg-(--notte) px-5 py-2.5 font-medium text-white shadow hover:bg-(--notte)/90">{editingId ? "Guardar cambios" : "Crear usuario"}</button>
+                            <button type="submit" disabled={isSubmitting} className="rounded-lg bg-(--notte) px-5 py-2.5 font-medium text-white shadow hover:bg-(--notte)/90 disabled:opacity-50">
+                                {isSubmitting ? "Guardando..." : (editingId ? "Guardar cambios" : "Crear usuario")}
+                            </button>
                         </div>
                     </form>
                 </Modal>
@@ -1342,6 +1352,41 @@ export default function AdminPage() {
                     <AdminReservationsBoard token={token} usuarios={usuarios} />
                 </div>
             ) : null}
+
+            {/* ── Status Modals ── */}
+            {error && (
+                <div style={{ zIndex: 1000 }} className="relative">
+                    <Modal onClose={() => setError("")}>
+                        <div className="text-center p-4">
+                            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-red-100 mb-6">
+                                <span className="text-red-600 text-3xl">⚠</span>
+                            </div>
+                            <h3 className="text-xl font-semibold text-gray-900 mb-2">Error</h3>
+                            <p className="text-gray-600 mb-6">{error}</p>
+                            <button type="button" onClick={() => setError("")} className="w-full sm:w-auto inline-flex justify-center rounded-lg bg-red-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-red-700">
+                                Cerrar
+                            </button>
+                        </div>
+                    </Modal>
+                </div>
+            )}
+
+            {mensaje && (
+                <div style={{ zIndex: 1000 }} className="relative">
+                    <Modal onClose={() => setMensaje("")}>
+                        <div className="text-center p-4">
+                            <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
+                                <span className="text-green-600 text-3xl">✓</span>
+                            </div>
+                            <h3 className="text-xl font-semibold text-gray-900 mb-2">Éxito</h3>
+                            <p className="text-gray-600 mb-6">{mensaje}</p>
+                            <button type="button" onClick={() => setMensaje("")} className="w-full sm:w-auto inline-flex justify-center rounded-lg bg-green-600 px-6 py-2.5 text-sm font-medium text-white hover:bg-green-700">
+                                Aceptar
+                            </button>
+                        </div>
+                    </Modal>
+                </div>
+            )}
         </Sidebar>
     )
 }
