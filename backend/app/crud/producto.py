@@ -1,9 +1,10 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import ConflictError, NotFoundError
 from app.database import commit_or_conflict
 from app.models.producto import Producto
+from app.models.reserva_producto import ReservaProducto
 from app.schemas.producto import ProductoCreate, ProductoUpdate
 
 
@@ -36,5 +37,10 @@ def actualizar(db: Session, id_producto: int, datos: ProductoUpdate) -> Producto
 
 
 def eliminar(db: Session, id_producto: int) -> None:
+    # Validate if it's associated with a reservation
+    asociaciones = db.scalar(select(ReservaProducto).where(ReservaProducto.id_producto == id_producto).limit(1))
+    if asociaciones:
+        raise ConflictError("No se puede eliminar el producto porque está asociado a una o más reservaciones.")
+
     db.delete(obtener(db, id_producto))
     commit_or_conflict(db)

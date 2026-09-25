@@ -5,6 +5,8 @@ from app.core.exceptions import ConflictError, CredencialesInvalidasError, NotFo
 from app.core.security import hash_password, verify_password
 from app.database import commit_or_conflict
 from app.models.usuario import Usuario
+from app.models.recuperacion import SolicitudRecuperacion
+from app.models.reserva import Reserva
 from app.schemas.usuario import UsuarioAdminCreate, UsuarioAdminUpdate, UsuarioCreate, UsuarioUpdate
 
 ROLES = {"Administrador": 1, "Empleado": 2, "Cliente": 3}
@@ -117,6 +119,17 @@ def cambiar_estado(db: Session, id_usuario: int, nuevo_estado: str) -> Usuario:
 
 def eliminar_usuario(db: Session, id_usuario: int) -> None:
     usuario = obtener_usuario(db, id_usuario)
+    
+    # Check for associated recovery requests
+    solicitud = db.scalar(select(SolicitudRecuperacion).where(SolicitudRecuperacion.id_usuario == id_usuario).limit(1))
+    if solicitud:
+        raise ConflictError("No se puede eliminar el usuario porque tiene solicitudes de recuperación de contraseña asociadas.")
+        
+    # Check for associated reservations (as client or employee)
+    reserva = db.scalar(select(Reserva).where((Reserva.id_cliente == id_usuario) | (Reserva.id_empleado == id_usuario)).limit(1))
+    if reserva:
+        raise ConflictError("No se puede eliminar el usuario porque está asociado a una o más reservaciones.")
+
     db.delete(usuario)
     db.commit()
 

@@ -1,8 +1,9 @@
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.core.exceptions import NotFoundError
+from app.core.exceptions import ConflictError, NotFoundError
 from app.database import commit_or_conflict
+from app.models.reserva_servicio import ReservaServicio
 from app.models.servicio import Servicio
 from app.schemas.servicio import ServicioCreate, ServicioUpdate
 
@@ -36,5 +37,10 @@ def actualizar(db: Session, id_servicio: int, datos: ServicioUpdate) -> Servicio
 
 
 def eliminar(db: Session, id_servicio: int) -> None:
+    # Validate if it's associated with a reservation
+    asociaciones = db.scalar(select(ReservaServicio).where(ReservaServicio.id_servicio == id_servicio).limit(1))
+    if asociaciones:
+        raise ConflictError("No se puede eliminar el servicio porque está asociado a una o más reservaciones.")
+
     db.delete(obtener(db, id_servicio))
     commit_or_conflict(db)
