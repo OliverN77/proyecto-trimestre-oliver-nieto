@@ -84,6 +84,23 @@ def actualizar_usuario_admin(db: Session, id_usuario: int, datos: UsuarioAdminUp
     cambios = datos.model_dump(exclude_unset=True)
     rol = cambios.pop("rol", None)
     contrasena = cambios.pop("contrasena", None)
+    
+    # Check for unique constraints if correo or numero_documento are being updated
+    correo_nuevo = cambios.get("correo")
+    numero_doc_nuevo = cambios.get("numero_documento")
+    if correo_nuevo or numero_doc_nuevo:
+        query = select(Usuario).where(Usuario.id_usuario != id_usuario)
+        condiciones = []
+        if correo_nuevo:
+            condiciones.append(Usuario.correo == correo_nuevo)
+        if numero_doc_nuevo:
+            condiciones.append(Usuario.numero_documento == numero_doc_nuevo)
+        
+        from sqlalchemy import or_
+        existe = db.scalar(query.where(or_(*condiciones)))
+        if existe:
+            raise ConflictError("Ya existe otro usuario con ese correo o número de documento")
+
     if rol is not None:
         if rol not in ROLES:
             raise ConflictError("Rol inválido")

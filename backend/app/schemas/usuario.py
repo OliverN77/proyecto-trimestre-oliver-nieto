@@ -45,6 +45,9 @@ class UsuarioAdminCreate(UsuarioBase):
 
 
 class UsuarioAdminUpdate(UsuarioUpdate):
+    correo: EmailStr | None = None
+    tipo_documento: str | None = Field(default=None, min_length=2, max_length=20)
+    numero_documento: str | None = Field(default=None, min_length=5, max_length=20)
     contrasena: str | None = Field(default=None, min_length=8, max_length=64)
     rol: str | None = None
 
