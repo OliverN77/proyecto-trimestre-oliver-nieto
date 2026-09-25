@@ -106,7 +106,10 @@ export default function RegisterModal({ isOpen, onClose }) {
     }
 
     function handleChange(event) {
-        const { name, value } = event.target
+        let { name, value } = event.target
+        if (name === "telefono" || name === "numeroDocumento") {
+            value = value.replace(/\D/g, "")
+        }
         setForm((previous) => {
             const next = { ...previous, [name]: value }
             // Re-touch confirmPassword so it re-validates live if password changes after it.
@@ -236,7 +239,7 @@ export default function RegisterModal({ isOpen, onClose }) {
 
                     <FieldWrapper error={fieldError("numeroDocumento")}>
                         <Input
-                            type="number"
+                            type="text"
                             label="Número de documento"
                             name="numeroDocumento"
                             value={form.numeroDocumento}
@@ -264,7 +267,7 @@ export default function RegisterModal({ isOpen, onClose }) {
                 <div className="grid grid-cols-1 gap-x-4 sm:grid-cols-2">
                     <FieldWrapper error={fieldError("telefono")}>
                         <Input
-                            type="number"
+                            type="text"
                             label="Teléfono"
                             name="telefono"
                             value={form.telefono}
